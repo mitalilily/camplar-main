@@ -14,15 +14,17 @@ import { toast } from '../UI/Toast'
 import EmailVerificationForm from './EmailVerificationForm'
 import { getAuthErrorMessage } from './getAuthErrorMessage'
 
-const DE_BLUE = '#171310'
-const DE_AMBER = '#2D7A63'
+const DE_BLUE = '#000B37'
+const DE_SOFT = '#001D67'
+const DE_AMBER = '#A93800'
+const DE_MUTED = '#5F7187'
 
 const primaryButtonStyles = {
   width: '100%',
-  borderRadius: 1,
+  borderRadius: 4,
   bgcolor: DE_BLUE,
   boxShadow: `0 8px 24px ${alpha(DE_BLUE, 0.3)}`,
-  '&:hover': { bgcolor: '#0D0A08' },
+  '&:hover': { bgcolor: DE_SOFT },
 }
 
 interface IPasswordFormProps {
@@ -85,7 +87,7 @@ export default function PasswordLoginForm({ setStep, step, setOpenTerms }: IPass
   }
 
   const termsLabel = (
-    <Typography fontSize="13px" display="flex" alignItems="center" gap="3px" color="#6A616A">
+    <Typography fontSize="13px" display="flex" alignItems="center" gap="3px" color={DE_MUTED}>
       I agree to{' '}
       <Link
         component="button"
@@ -172,12 +174,12 @@ export default function PasswordLoginForm({ setStep, step, setOpenTerms }: IPass
       <Box
         sx={{
           p: 1.5,
-          borderRadius: 1,
+          borderRadius: 3,
           border: `1px solid ${alpha(DE_BLUE, 0.1)}`,
           backgroundColor: alpha(DE_BLUE, 0.04),
         }}
       >
-        <Typography variant="body2" sx={{ color: '#6A616A', lineHeight: 1.6, fontWeight: 500 }}>
+        <Typography variant="body2" sx={{ color: DE_MUTED, lineHeight: 1.7, fontWeight: 500 }}>
           Enter your registered email and password. If verification is needed, the code will
           appear directly on this screen.
         </Typography>
@@ -213,7 +215,7 @@ export default function PasswordLoginForm({ setStep, step, setOpenTerms }: IPass
               }
               arrow
             >
-              <Box sx={{ display: 'inline-flex', alignItems: 'center', color: '#FFAB00' }}>
+              <Box sx={{ display: 'inline-flex', alignItems: 'center', color: DE_AMBER }}>
                 <MdInfoOutline size={17} />
               </Box>
             </Tooltip>
@@ -256,7 +258,7 @@ export default function PasswordLoginForm({ setStep, step, setOpenTerms }: IPass
 
       <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
         <FiShield size={13} color={DE_AMBER} />
-        <Typography variant="caption" sx={{ color: '#6A616A', fontWeight: 600 }}>
+        <Typography variant="caption" sx={{ color: DE_MUTED, fontWeight: 600 }}>
           Verification safeguards are applied for suspicious login attempts.
         </Typography>
       </Stack>

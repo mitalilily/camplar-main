@@ -10,14 +10,17 @@ import CustomInput from '../UI/inputs/CustomInput'
 import { toast } from '../UI/Toast'
 import { getAuthErrorMessage } from './getAuthErrorMessage'
 
-const DE_BLUE = '#171310'
+const DE_BLUE = '#000B37'
+const DE_SOFT = '#001D67'
+const DE_ORANGE = '#A93800'
+const DE_MUTED = '#5F7187'
 
 const primaryButtonStyles = {
   width: '100%',
-  borderRadius: 1,
+  borderRadius: 4,
   bgcolor: DE_BLUE,
   boxShadow: `0 8px 24px ${alpha(DE_BLUE, 0.3)}`,
-  '&:hover': { bgcolor: '#0D0A08' },
+  '&:hover': { bgcolor: DE_SOFT },
 }
 
 const secondaryButtonStyles = {
@@ -25,7 +28,7 @@ const secondaryButtonStyles = {
   border: `1px solid ${alpha(DE_BLUE, 0.2)}`,
   color: DE_BLUE,
   backgroundColor: alpha(DE_BLUE, 0.04),
-  borderRadius: 1,
+  borderRadius: 4,
 }
 
 interface IEmailVerificationProps {
@@ -108,12 +111,12 @@ export default function EmailVerificationForm({
       <Box
         sx={{
           p: 1.6,
-          borderRadius: 1,
+          borderRadius: 3,
           backgroundColor: alpha(DE_BLUE, 0.04),
           border: `1px solid ${alpha(DE_BLUE, 0.1)}`,
         }}
       >
-        <Typography variant="body2" sx={{ color: '#42526E', lineHeight: 1.6, fontWeight: 500 }}>
+        <Typography variant="body2" sx={{ color: DE_MUTED, lineHeight: 1.7, fontWeight: 500 }}>
           Verification code generated for <strong>{email}</strong>.
           <Box component="span" sx={{ ml: 0.7, display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: DE_BLUE }} onClick={onEditEmail}>
             <FiEdit2 size={13} style={{ marginRight: 4 }} />
@@ -126,13 +129,13 @@ export default function EmailVerificationForm({
         <Box
           sx={{
             p: 1.5,
-            borderRadius: 1,
-            backgroundColor: alpha('#56C0A5', 0.08),
-            border: `1px solid ${alpha('#56C0A5', 0.28)}`,
+            borderRadius: 3,
+            backgroundColor: alpha(DE_ORANGE, 0.08),
+            border: `1px solid ${alpha(DE_ORANGE, 0.24)}`,
             textAlign: 'center',
           }}
         >
-          <Typography variant="caption" sx={{ display: 'block', color: '#2D6A5A', fontWeight: 800, letterSpacing: 1.4 }}>
+          <Typography variant="caption" sx={{ display: 'block', color: DE_ORANGE, fontWeight: 800, letterSpacing: 1.4 }}>
             DEMO VERIFICATION CODE
           </Typography>
           <Typography sx={{ mt: 0.45, color: DE_BLUE, fontSize: '1.55rem', fontWeight: 900, letterSpacing: '0.22em' }}>

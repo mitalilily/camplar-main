@@ -1,24 +1,32 @@
-import { alpha, Box, Button, Grid, Stack, Typography } from '@mui/material'
+import { alpha, Box, Grid, Stack, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
-import { TbChartArcs, TbMap2, TbShieldCheck, TbTruckDelivery } from 'react-icons/tb'
+import { TbMap2, TbShieldCheck, TbSparkles, TbTruckDelivery } from 'react-icons/tb'
 import { DoorstepCourierScene, RollingVanScene } from '../branding/AnimatedCourierScene'
 import { CAMPLAR_BRAND, CAMPLAR_COLORS, CAMPLAR_FONTS } from '../../utils/brand'
 import PhoneForm from './PhoneForm'
 
-const SKY = CAMPLAR_COLORS.primary
-const GOLD = '#DCE1FF'
+const NAVY = CAMPLAR_COLORS.primary
+const NAVY_SOFT = CAMPLAR_COLORS.primarySoft
 const ORANGE = CAMPLAR_COLORS.secondaryBright
+const ORANGE_DEEP = CAMPLAR_COLORS.secondary
+const SURFACE = CAMPLAR_COLORS.surface
+const SURFACE_LOW = CAMPLAR_COLORS.surfaceLow
 const TEXT = CAMPLAR_COLORS.text
 const MUTED = CAMPLAR_COLORS.textMuted
-const SURFACE = CAMPLAR_COLORS.surface
-const SURFACE_SOFT = '#FBFCFF'
 const TYPEFACE = CAMPLAR_FONTS.heading
+const currentYear = new Date().getFullYear()
 
-const chips = ['Editorial login', 'Cleaner hierarchy', 'Smart tracking']
-const highlights = [
-  { value: '12+', label: 'service lanes covered', icon: <TbTruckDelivery size={16} /> },
-  { value: '24/7', label: 'status visibility', icon: <TbMap2 size={16} /> },
-  { value: '1', label: 'clean dispatch desk', icon: <TbChartArcs size={16} /> },
+const featureCards = [
+  {
+    title: 'Real-time Velocity',
+    text: 'Instant updates across every order, courier lane, and delivery touchpoint.',
+    icon: <TbTruckDelivery size={18} />,
+  },
+  {
+    title: 'Enterprise Security',
+    text: 'Inline verification and controlled access for daily logistics operations.',
+    icon: <TbShieldCheck size={18} />,
+  },
 ]
 
 export default function LoginForm() {
@@ -26,296 +34,311 @@ export default function LoginForm() {
     <Box
       sx={{
         minHeight: '100vh',
+        bgcolor: SURFACE,
         background: `
-          radial-gradient(920px 320px at 0% 0%, ${alpha(GOLD, 0.42)} 0%, transparent 58%),
-          radial-gradient(760px 260px at 100% 0%, ${alpha(ORANGE, 0.16)} 0%, transparent 52%),
-          linear-gradient(180deg, ${SURFACE_SOFT} 0%, ${SURFACE} 100%)
+          radial-gradient(720px 280px at 0% 0%, ${alpha(CAMPLAR_COLORS.surfaceHigh, 0.88)} 0%, transparent 58%),
+          radial-gradient(560px 240px at 100% 0%, ${alpha(ORANGE, 0.11)} 0%, transparent 44%),
+          linear-gradient(180deg, ${alpha('#FFFFFF', 0.96)} 0%, ${SURFACE} 100%)
         `,
-        px: { xs: 1.5, sm: 2.5, md: 3 },
-        py: { xs: 2, sm: 3 },
-        display: 'flex',
-        alignItems: 'center',
       }}
     >
-      <Grid
-        container
-        component={motion.div}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        sx={{
-          width: '100%',
-          maxWidth: 1220,
-          mx: 'auto',
-          borderRadius: { xs: 2.5, md: 3.5 },
-          overflow: 'hidden',
-          backgroundColor: alpha('#FFFDF8', 0.9),
-          border: `1px solid ${alpha(SKY, 0.12)}`,
-          boxShadow: `0 24px 56px ${alpha(TEXT, 0.1)}`,
-          backdropFilter: 'blur(14px)',
-          minHeight: { xs: 'auto', md: 700 },
-        }}
-      >
+      <Grid container sx={{ minHeight: '100vh' }}>
         <Grid
           size={{ xs: 12, md: 6 }}
           sx={{
-          display: { xs: 'none', md: 'flex' },
-          background: `
-              radial-gradient(340px 180px at 0% 0%, ${alpha('#FFFFFF', 0.12)} 0%, transparent 74%),
-              radial-gradient(260px 160px at 100% 10%, ${alpha(ORANGE, 0.16)} 0%, transparent 70%),
-              linear-gradient(180deg, ${alpha(SKY, 0.96)} 0%, ${alpha(CAMPLAR_COLORS.primarySoft, 0.98)} 100%)
-            `,
-            color: '#ffffff',
-            p: { xs: 2.5, md: 4 },
+            display: { xs: 'none', md: 'flex' },
             position: 'relative',
-            borderRight: { xs: 'none', md: `1px solid ${alpha(SKY, 0.1)}` },
+            overflow: 'hidden',
+            color: '#ffffff',
+            background: `linear-gradient(135deg, ${NAVY} 0%, ${NAVY_SOFT} 100%)`,
+            px: { md: 5, lg: 7 },
+            py: { md: 5, lg: 6 },
+            flexDirection: 'column',
+            justifyContent: 'space-between',
           }}
         >
-          <Stack spacing={3} sx={{ position: 'relative', zIndex: 1, justifyContent: 'center', width: '100%' }}>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              {chips.map((chip) => (
-                <Box
-                  key={chip}
-                  sx={{
-                    px: 1.5,
-                    py: 0.7,
-                    borderRadius: 1.1,
-                    border: `1px solid ${alpha('#FFFFFF', 0.14)}`,
-                    backgroundColor: alpha('#FFFFFF', 0.08),
-                  }}
-                >
-                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: alpha('#ffffff', 0.76), letterSpacing: 0.15 }}>
-                    {chip}
-                  </Typography>
-                </Box>
-              ))}
-            </Stack>
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              opacity: 0.22,
+              pointerEvents: 'none',
+            }}
+          >
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '-12%',
+                right: '-14%',
+                width: 420,
+                height: 420,
+                borderRadius: '50%',
+                bgcolor: alpha(ORANGE_DEEP, 0.9),
+                filter: 'blur(100px)',
+              }}
+            />
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: '-10%',
+                left: '-10%',
+                width: 320,
+                height: 320,
+                borderRadius: '50%',
+                bgcolor: alpha('#FFFFFF', 0.18),
+                filter: 'blur(90px)',
+              }}
+            />
+          </Box>
 
+          <Stack spacing={5} sx={{ position: 'relative', zIndex: 1 }}>
             <Stack direction="row" spacing={1.6} alignItems="center">
               <Box
                 sx={{
-                  width: 54,
-                  height: 54,
-                  borderRadius: 3,
-                  bgcolor: '#ffffff',
+                  width: 46,
+                  height: 46,
+                  borderRadius: 2.5,
+                  bgcolor: alpha(ORANGE_DEEP, 0.92),
                   display: 'grid',
                   placeItems: 'center',
+                  boxShadow: `0 18px 42px ${alpha(ORANGE_DEEP, 0.26)}`,
                 }}
               >
-                <Box component="img" src={CAMPLAR_BRAND.logoMark} alt={CAMPLAR_BRAND.name} sx={{ width: 28 }} />
+                <Box component="img" src={CAMPLAR_BRAND.logoMark} alt={CAMPLAR_BRAND.name} sx={{ width: 24 }} />
               </Box>
-              <Stack spacing={0.3}>
-                <Typography sx={{ fontFamily: TYPEFACE, fontWeight: 800, fontSize: '2rem', letterSpacing: '-0.04em' }}>
-                  {CAMPLAR_BRAND.uppercaseName}
-                </Typography>
-                <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: alpha('#ffffff', 0.72), letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-                  {CAMPLAR_BRAND.tagLine}
-                </Typography>
-              </Stack>
-            </Stack>
-
-            <Stack spacing={1} alignItems="flex-start" sx={{ maxWidth: 340 }}>
-              <Box
-                component={motion.div}
-                initial={{ rotate: -14, scale: 0.9 }}
-                animate={{ rotate: 0, scale: 1 }}
-                whileHover={{ rotate: 12 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-                sx={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 1.3,
-                  bgcolor: alpha('#ffffff', 0.12),
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <TbShieldCheck size={20} />
-              </Box>
-              <Typography
-                sx={{
-                  fontSize: '0.8rem',
-                  fontWeight: 800,
-                  color: alpha('#ffffff', 0.78),
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  lineHeight: 1.45,
-                  maxWidth: 320,
-                }}
-              >
-                Brand-led access for bookings, tracking, and calmer parcel operations
-              </Typography>
               <Typography
                 sx={{
                   fontFamily: TYPEFACE,
-                  fontSize: { xs: '1rem', md: '1.15rem' },
-                  fontWeight: 800,
-                  color: alpha('#ffffff', 0.92),
-                  letterSpacing: '-0.02em',
+                  fontSize: '2rem',
+                  fontWeight: 900,
+                  letterSpacing: '-0.05em',
                 }}
               >
-                Camplar access for bookings, tracking, and finance visibility.
+                {CAMPLAR_BRAND.name}
               </Typography>
             </Stack>
 
-            <Typography
-              sx={{
-                fontFamily: TYPEFACE,
-                fontSize: { xs: '2.1rem', md: '3.35rem' },
-                lineHeight: 0.99,
-                fontWeight: 800,
-                maxWidth: 540,
-                color: '#ffffff',
-                letterSpacing: '-0.04em',
-              }}
-            >
-              Navigate courier
-              <Box component="span" sx={{ color: alpha('#ffffff', 0.78), display: 'block' }}>
-                operations with clearer hierarchy.
-              </Box>
-            </Typography>
-
-            <Typography sx={{ color: alpha('#ffffff', 0.74), fontSize: '0.95rem', maxWidth: 485, lineHeight: 1.7 }}>
-              Camplar keeps daily shipping work lighter with cleaner access, sharper tracking
-              visibility, and one branded workspace for every order moving through your panel.
-            </Typography>
+            <Box sx={{ maxWidth: 560 }}>
+              <Typography
+                sx={{
+                  fontFamily: TYPEFACE,
+                  fontSize: { md: '3.1rem', lg: '4rem' },
+                  fontWeight: 900,
+                  lineHeight: 1.02,
+                  letterSpacing: '-0.05em',
+                  mb: 2.2,
+                }}
+              >
+                Navigate global logistics
+                <Box component="span" sx={{ display: 'block', color: alpha('#FFFFFF', 0.74) }}>
+                  with kinetic precision.
+                </Box>
+              </Typography>
+              <Typography
+                sx={{
+                  color: alpha('#FFFFFF', 0.74),
+                  fontSize: '1.02rem',
+                  lineHeight: 1.8,
+                  maxWidth: 500,
+                }}
+              >
+                Join enterprise shipping teams using Camplar to monitor dispatch, track delivery
+                movement, and manage daily logistics from one refined operations workspace.
+              </Typography>
+            </Box>
 
             <RollingVanScene compact />
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-              {highlights.map((item) => (
-                <Box
-                  key={item.label}
-                  sx={{
-                    flex: 1,
-                    minWidth: 0,
-                    borderRadius: 1.8,
-                    border: `1px solid ${alpha('#FFFFFF', 0.12)}`,
-                    backgroundColor: alpha('#FFFFFF', 0.08),
-                    px: 1.8,
-                    py: 1.5,
-                    boxShadow: `0 8px 18px ${alpha('#000000', 0.08)}`,
-                  }}
-                >
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Box sx={{ color: '#ffffff', display: 'flex' }}>{item.icon}</Box>
-                    <Typography
-                      sx={{
-                        fontFamily: TYPEFACE,
-                        fontSize: '1.45rem',
-                        fontWeight: 800,
-                        color: '#ffffff',
-                        lineHeight: 1,
-                      }}
-                    >
-                      {item.value}
+            <Grid container spacing={2}>
+              {featureCards.map((card) => (
+                <Grid key={card.title} size={{ xs: 12, lg: 6 }}>
+                  <Box
+                    component={motion.div}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, ease: 'easeOut' }}
+                    sx={{
+                      height: '100%',
+                      borderRadius: 3,
+                      px: 2.5,
+                      py: 2.4,
+                      border: `1px solid ${alpha('#FFFFFF', 0.12)}`,
+                      backgroundColor: alpha('#FFFFFF', 0.1),
+                      backdropFilter: 'blur(22px)',
+                    }}
+                  >
+                    <Box sx={{ color: alpha('#FFDBCF', 0.96), mb: 1.3, display: 'inline-flex' }}>
+                      {card.icon}
+                    </Box>
+                    <Typography sx={{ fontWeight: 800, fontSize: '1rem', mb: 0.6 }}>
+                      {card.title}
                     </Typography>
-                  </Stack>
-                  <Typography sx={{ mt: 0.7, color: alpha('#ffffff', 0.72), fontSize: '0.82rem', lineHeight: 1.55 }}>
-                    {item.label}
-                  </Typography>
-                </Box>
+                    <Typography sx={{ color: alpha('#FFFFFF', 0.66), fontSize: '0.84rem', lineHeight: 1.7 }}>
+                      {card.text}
+                    </Typography>
+                  </Box>
+                </Grid>
               ))}
-            </Stack>
+            </Grid>
           </Stack>
+
+          <Typography
+            sx={{
+              position: 'relative',
+              zIndex: 1,
+              color: alpha('#FFFFFF', 0.42),
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              mt: 3,
+            }}
+          >
+            © {currentYear} Camplar Kinetic. All rights reserved.
+          </Typography>
         </Grid>
 
         <Grid
           size={{ xs: 12, md: 6 }}
           sx={{
-            px: { xs: 2, sm: 3, md: 4 },
-            py: { xs: 2.4, sm: 3.2, md: 4 },
-            background: `linear-gradient(180deg, ${alpha('#FFFFFF', 0.94)} 0%, ${alpha('#F8F2EA', 0.92)} 100%)`,
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
+            px: { xs: 2.5, sm: 4, md: 5, lg: 7 },
+            py: { xs: 4.5, sm: 5.5, md: 6 },
+            bgcolor: alpha('#FFFFFF', 0.82),
           }}
         >
-          <Box sx={{ width: '100%', maxWidth: 520, mx: 'auto' }}>
-            <Stack spacing={1.2} mb={2.8}>
-              <Stack direction="row" spacing={1.2} alignItems="center">
+          <Box sx={{ width: '100%', maxWidth: 540 }}>
+            <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 4.5 }}>
+              <Stack direction="row" spacing={1.4} alignItems="center" mb={2.5}>
                 <Box
-                  component={motion.div}
-                  animate={{ y: [0, -4, 0] }}
-                  transition={{ repeat: Infinity, duration: 2.8 }}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 2,
+                    bgcolor: ORANGE_DEEP,
+                    display: 'grid',
+                    placeItems: 'center',
+                  }}
+                >
+                  <Box component="img" src={CAMPLAR_BRAND.logoMark} alt={CAMPLAR_BRAND.name} sx={{ width: 20 }} />
+                </Box>
+                <Typography
+                  sx={{
+                    fontFamily: TYPEFACE,
+                    fontWeight: 900,
+                    fontSize: '1.55rem',
+                    color: NAVY,
+                    letterSpacing: '-0.05em',
+                  }}
+                >
+                  {CAMPLAR_BRAND.name}
+                </Typography>
+              </Stack>
+              <DoorstepCourierScene compact />
+            </Box>
+
+            <Stack spacing={1.5} mb={3.2}>
+              <Stack direction="row" spacing={1.1} alignItems="center">
+                <Box
                   sx={{
                     width: 34,
                     height: 34,
-                    borderRadius: 1.15,
-                    bgcolor: alpha(SKY, 0.1),
-                    color: SKY,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    borderRadius: 2,
+                    bgcolor: alpha(ORANGE_DEEP, 0.1),
+                    color: ORANGE_DEEP,
+                    display: 'grid',
+                    placeItems: 'center',
                   }}
                 >
-                  <TbTruckDelivery size={18} />
+                  <TbSparkles size={18} />
                 </Box>
-                <Typography sx={{ fontSize: '0.74rem', letterSpacing: 2, fontWeight: 700, color: SKY }}>
-                  CAMPLAR ACCESS
+                <Typography
+                  sx={{
+                    color: ORANGE_DEEP,
+                    fontSize: '0.76rem',
+                    fontWeight: 800,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Client Sign In
                 </Typography>
               </Stack>
 
               <Typography
-                variant="h4"
                 sx={{
                   fontFamily: TYPEFACE,
-                  fontWeight: 800,
-                  color: TEXT,
-                  lineHeight: 1.06,
-                  fontSize: { xs: '1.82rem', sm: '2.18rem' },
-                  letterSpacing: '-0.03em',
+                  fontSize: { xs: '2rem', sm: '2.5rem' },
+                  fontWeight: 900,
+                  color: NAVY,
+                  letterSpacing: '-0.05em',
+                  lineHeight: 1.02,
                 }}
               >
-                Welcome to Camplar
+                Welcome Back
               </Typography>
 
-              <Typography variant="body2" sx={{ color: MUTED, lineHeight: 1.7, maxWidth: 460 }}>
-                Continue with OTP or password to book, track, and manage parcels from one clear
-                editorial-style operations desk.
+              <Typography sx={{ color: MUTED, lineHeight: 1.8, maxWidth: 460 }}>
+                Sign in with one-time passcode or password to access your Camplar dashboard,
+                manage shipments, and keep every parcel lane in motion.
               </Typography>
-            </Stack>
 
-            <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 2.4 }}>
-              <DoorstepCourierScene compact />
-            </Box>
-
-            <Stack direction="row" spacing={1.2} sx={{ mb: 2.2, flexWrap: 'wrap' }} useFlexGap>
-              {['Client demo ready', 'Inline verification', 'Cleaner login'].map((pill) => (
-                <Button
-                  key={pill}
-                  variant="outlined"
-                  size="small"
-                  sx={{
-                    borderRadius: 1.25,
-                    borderColor: alpha(SKY, 0.14),
-                    color: TEXT,
-                    bgcolor: alpha('#FFFFFF', 0.76),
-                    fontWeight: 700,
-                    px: 1.5,
-                  }}
-                >
-                  {pill}
-                </Button>
-              ))}
+              <Stack direction="row" spacing={1.2} useFlexGap flexWrap="wrap">
+                {[
+                  { label: 'Live ops access', icon: <TbTruckDelivery size={15} /> },
+                  { label: 'Inline verification', icon: <TbShieldCheck size={15} /> },
+                  { label: 'Global visibility', icon: <TbMap2 size={15} /> },
+                ].map((pill) => (
+                  <Box
+                    key={pill.label}
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.9,
+                      px: 1.6,
+                      py: 1,
+                      borderRadius: 999,
+                      bgcolor: alpha(SURFACE_LOW, 0.95),
+                      border: `1px solid ${alpha(NAVY, 0.08)}`,
+                      color: TEXT,
+                    }}
+                  >
+                    <Box sx={{ color: ORANGE_DEEP, display: 'flex' }}>{pill.icon}</Box>
+                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 700 }}>{pill.label}</Typography>
+                  </Box>
+                ))}
+              </Stack>
             </Stack>
 
             <Box
               sx={{
-                borderRadius: 4,
-                p: { xs: 1.6, sm: 2.2 },
-                border: `1px solid ${alpha(SKY, 0.12)}`,
+                borderRadius: 5,
+                p: { xs: 2.1, sm: 2.8 },
+                border: `1px solid ${alpha(NAVY, 0.1)}`,
                 background: `
-                  radial-gradient(280px 120px at 0% 0%, ${alpha(SKY, 0.05)} 0%, transparent 74%),
-                  radial-gradient(220px 100px at 100% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 76%),
+                  radial-gradient(260px 120px at 0% 0%, ${alpha(CAMPLAR_COLORS.surfaceHigh, 0.68)} 0%, transparent 76%),
+                  radial-gradient(220px 120px at 100% 0%, ${alpha(ORANGE, 0.11)} 0%, transparent 74%),
                   linear-gradient(180deg, ${alpha('#FFFFFF', 0.98)} 0%, ${alpha(SURFACE, 0.95)} 100%)
                 `,
-                boxShadow: `0 12px 28px ${alpha(TEXT, 0.065)}`,
+                boxShadow: `0 20px 48px ${alpha(TEXT, 0.08)}`,
               }}
             >
               <PhoneForm />
             </Box>
+
+            <Typography
+              sx={{
+                mt: 3,
+                color: alpha(MUTED, 0.82),
+                fontSize: '0.72rem',
+                lineHeight: 1.8,
+                textAlign: 'center',
+              }}
+            >
+              Secure client access for Camplar shipping operations. Need help? {CAMPLAR_BRAND.email}
+            </Typography>
           </Box>
         </Grid>
       </Grid>

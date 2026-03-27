@@ -12,6 +12,7 @@ import { alpha } from '@mui/material/styles'
 import { useCallback, useEffect, useState } from 'react'
 import { FiMail, FiShield } from 'react-icons/fi'
 import { useRequestOtp } from '../../hooks/useOTP'
+import { CAMPLAR_BRAND } from '../../utils/brand'
 import { TERMS_AND_CONDITIONS } from '../../utils/constants'
 import { TEXT } from '../../theme/theme'
 import CustomIconLoadingButton from '../UI/button/CustomLoadingButton'
@@ -23,14 +24,17 @@ import OtpForm from './OtpForm'
 import PasswordLoginForm from './PasswordLoginForm'
 import { getAuthErrorMessage } from './getAuthErrorMessage'
 
-const DE_BLUE = '#171310'
+const DE_BLUE = '#000B37'
+const DE_SOFT = '#001D67'
+const DE_ORANGE = '#A93800'
+const DE_MUTED = '#5F7187'
 
 const primaryButtonStyles = {
   width: '100%',
-  borderRadius: 1,
+  borderRadius: 4,
   bgcolor: DE_BLUE,
   boxShadow: `0 8px 24px ${alpha(DE_BLUE, 0.3)}`,
-  '&:hover': { bgcolor: '#0D0A08' },
+  '&:hover': { bgcolor: DE_SOFT },
 }
 
 const secondaryButtonStyles = {
@@ -38,7 +42,7 @@ const secondaryButtonStyles = {
   border: `1px solid ${alpha(DE_BLUE, 0.2)}`,
   backgroundColor: alpha(DE_BLUE, 0.04),
   color: DE_BLUE,
-  borderRadius: 1,
+  borderRadius: 4,
 }
 
 export default function PhoneForm() {
@@ -110,7 +114,7 @@ export default function PhoneForm() {
   }, [activeEmail])
 
   const termsLabel = (
-    <Typography fontSize="13px" display="flex" alignItems="center" gap="3px" color="#6A616A">
+    <Typography fontSize="13px" display="flex" alignItems="center" gap="3px" color={DE_MUTED}>
       I agree to{' '}
       <Link
         component="button"
@@ -180,26 +184,45 @@ export default function PhoneForm() {
   return (
     <Stack spacing={2.2} alignItems="stretch">
       <Stack spacing={1.2}>
-        <Typography variant="h6" sx={{ fontWeight: 800, color: DE_BLUE }}>
-          Secure Authentication
+        <Typography
+          sx={{
+            fontSize: '0.74rem',
+            letterSpacing: '0.18em',
+            fontWeight: 800,
+            color: DE_ORANGE,
+            textTransform: 'uppercase',
+          }}
+        >
+          Secure Access
         </Typography>
-        <Typography variant="body2" sx={{ color: '#6A616A', lineHeight: 1.6, fontWeight: 500 }}>
-          Access your logistics dashboard using your registered work email. Demo verification
-          codes appear directly on the screen when generated.
+        <Typography
+          sx={{
+            fontSize: '1.35rem',
+            fontWeight: 850,
+            color: DE_BLUE,
+            letterSpacing: '-0.03em',
+            lineHeight: 1.15,
+          }}
+        >
+          Sign in with your work email
+        </Typography>
+        <Typography variant="body2" sx={{ color: DE_MUTED, lineHeight: 1.7, fontWeight: 500 }}>
+          Continue with inline OTP or password login. Local demo verification codes are surfaced
+          directly in the panel when generated.
         </Typography>
 
         <Chip
           icon={<FiShield size={14} />}
-          label="Enterprise-grade security"
+          label="Inline verification enabled"
           size="small"
           sx={{
             alignSelf: 'flex-start',
             mt: 0.2,
-            backgroundColor: alpha('#36B37E', 0.1),
-            color: '#00875A',
+            backgroundColor: alpha(DE_ORANGE, 0.08),
+            color: DE_ORANGE,
             fontWeight: 700,
-            borderRadius: 1,
-            '& .MuiChip-icon': { color: '#00875A' },
+            borderRadius: 999,
+            '& .MuiChip-icon': { color: DE_ORANGE },
           }}
         />
       </Stack>
@@ -215,19 +238,19 @@ export default function PhoneForm() {
         fullWidth
         sx={{
           p: 0.5,
-          borderRadius: 1,
+          borderRadius: 3,
           backgroundColor: alpha(DE_BLUE, 0.04),
           border: `1px solid ${alpha(DE_BLUE, 0.08)}`,
           '& .MuiToggleButton-root': {
             textTransform: 'none',
             fontWeight: 800,
             border: 'none',
-            borderRadius: 0.5,
+            borderRadius: 2.4,
             color: alpha(TEXT, 0.6),
             '&.Mui-selected': {
               backgroundColor: '#FFFFFF',
               color: DE_BLUE,
-              boxShadow: '0 4px 12px rgba(138, 31, 67, 0.12)',
+              boxShadow: `0 10px 22px ${alpha(DE_BLUE, 0.12)}`,
               '&:hover': {
                 backgroundColor: '#FFFFFF',
               },
@@ -251,6 +274,10 @@ export default function PhoneForm() {
         variant="text"
         text="View terms and policies"
       />
+
+      <Typography sx={{ color: alpha(DE_MUTED, 0.9), fontSize: '0.78rem', textAlign: 'center', lineHeight: 1.7 }}>
+        Support contact: {CAMPLAR_BRAND.email}
+      </Typography>
 
       <CustomModal
         open={openTerms}
