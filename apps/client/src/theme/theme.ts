@@ -213,6 +213,17 @@ const theme = createTheme({
         },
       },
     },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          background:
+            'radial-gradient(circle at 16% 6%, rgba(255,94,20,0.18) 0%, transparent 28%), linear-gradient(180deg, rgba(0,11,55,0.98) 0%, rgba(0,29,103,0.94) 100%)',
+          color: '#FFFFFF',
+          borderRight: `1px solid ${alpha('#ffffff', 0.08)}`,
+          boxShadow: `18px 0 42px ${alpha(BRAND_INK, 0.26)}`,
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
@@ -259,6 +270,56 @@ const theme = createTheme({
         },
       },
     },
+    MuiAccordion: {
+      styleOverrides: {
+        root: {
+          borderRadius: 20,
+          border: `1px solid ${alpha(BRAND_INK, 0.1)}`,
+          boxShadow: `0 18px 34px ${alpha(TEXT_PRIMARY, 0.05)}`,
+          background: `linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(236,244,255,0.94) 100%)`,
+          '&::before': {
+            display: 'none',
+          },
+        },
+      },
+    },
+    MuiAccordionSummary: {
+      styleOverrides: {
+        root: {
+          minHeight: 70,
+          paddingInline: 22,
+          background: `linear-gradient(180deg, ${alpha(BRAND_INK, 0.05)} 0%, ${alpha(
+            BRAND_INK,
+            0.02,
+          )} 100%)`,
+          '&.Mui-expanded': {
+            minHeight: 70,
+          },
+        },
+        content: {
+          marginBlock: 14,
+          '&.Mui-expanded': {
+            marginBlock: 14,
+          },
+        },
+      },
+    },
+    MuiAccordionDetails: {
+      styleOverrides: {
+        root: {
+          padding: 24,
+          backgroundColor: alpha('#ffffff', 0.82),
+        },
+      },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          borderRadius: 18,
+          border: `1px solid ${alpha(BRAND_INK, 0.1)}`,
+        },
+      },
+    },
     MuiTextField: {
       styleOverrides: {
         root: {
@@ -288,6 +349,19 @@ const theme = createTheme({
         },
       },
     },
+    MuiLinearProgress: {
+      styleOverrides: {
+        root: {
+          height: 10,
+          borderRadius: 999,
+          backgroundColor: alpha(BRAND_INK, 0.08),
+        },
+        bar: {
+          borderRadius: 999,
+          background: `linear-gradient(90deg, ${BRAND_CLAY} 0%, ${BRAND_CLAY_DARK} 100%)`,
+        },
+      },
+    },
     MuiLink: {
       styleOverrides: {
         root: {
@@ -296,6 +370,29 @@ const theme = createTheme({
           '&:hover': {
             color: BRAND_CLAY_DARK,
             textDecoration: 'underline',
+          },
+        },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 20,
+          border: `1px solid ${alpha(BRAND_INK, 0.1)}`,
+          boxShadow: `0 24px 44px ${alpha(TEXT_PRIMARY, 0.12)}`,
+          backdropFilter: 'blur(16px)',
+          background: alpha(SURFACE, 0.96),
+        },
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          borderRadius: 14,
+          marginInline: 8,
+          marginBlock: 2,
+          '&:hover': {
+            backgroundColor: alpha(BRAND_CLAY, 0.08),
           },
         },
       },

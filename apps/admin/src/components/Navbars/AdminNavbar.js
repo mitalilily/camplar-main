@@ -21,7 +21,7 @@ const navItems = [
 ];
 
 export default function AdminNavbar(props) {
-  const { fixed, secondary, onOpen, sidebarWidth = 275, ...rest } = props;
+  const { fixed, secondary, onOpen, sidebarWidth = 275, brandText, ...rest } = props;
 
   const mainText = useColorModeValue("#171310", "gray.100");
   const secondaryText = useColorModeValue("#74685D", "gray.400");
@@ -115,6 +115,28 @@ export default function AdminNavbar(props) {
             >
               {CAMPLAR_BRAND.uppercaseName}
             </Text>
+            {brandText ? (
+              <HStack spacing={2} color={secondaryText}>
+                <Text
+                  fontSize="10px"
+                  fontWeight="800"
+                  letterSpacing="0.16em"
+                  textTransform="uppercase"
+                >
+                  Admin
+                </Text>
+                <Text color={secondaryText}>/</Text>
+                <Text
+                  fontSize="10px"
+                  fontWeight="800"
+                  letterSpacing="0.14em"
+                  textTransform="uppercase"
+                  color="secondary.500"
+                >
+                  {brandText}
+                </Text>
+              </HStack>
+            ) : null}
           </Stack>
         </Flex>
 

@@ -2,6 +2,7 @@ import {
   alpha,
   Box,
   Button,
+  Chip,
   IconButton,
   Stack,
   Typography,
@@ -39,6 +40,39 @@ const sectionLinks = [
   { label: 'Support', path: '/support/tickets' },
 ]
 
+const routeLabels: Record<string, string> = {
+  dashboard: 'Dashboard',
+  home: 'Home',
+  orders: 'Shipments',
+  list: 'All Shipments',
+  create: 'Create Shipment',
+  billing: 'Billing',
+  invoice_management: 'Invoice Management',
+  wallet_transactions: 'Wallet Transactions',
+  settings: 'Settings',
+  support: 'Support',
+  tickets: 'Tickets',
+  tools: 'Tools',
+  rate_card: 'Rate Card',
+  rate_calculator: 'Rate Calculator',
+  order_tracking: 'Order Tracking',
+  reports: 'Reports',
+  couriers: 'Couriers',
+  partners: 'Partners',
+  profile: 'Profile',
+  policies: 'Policies',
+  channels: 'Channels',
+  reconciliation: 'Reconciliation',
+  weight: 'Weight',
+}
+
+const getBreadcrumbTrail = (pathname: string) =>
+  pathname
+    .split('/')
+    .filter(Boolean)
+    .slice(0, 3)
+    .map((segment) => routeLabels[segment] || segment.replace(/[-_]/g, ' '))
+
 export default function Navbar({ handleDrawerToggle, pinned }: NavbarProps) {
   const theme = useTheme()
   const navigate = useNavigate()
@@ -46,6 +80,7 @@ export default function Navbar({ handleDrawerToggle, pinned }: NavbarProps) {
   const isTablet = useMediaQuery(theme.breakpoints.down('lg'))
   const isCompactDesktop = useMediaQuery(theme.breakpoints.down('xl'))
   const showWideDesktopNav = !isCompactDesktop
+  const breadcrumbTrail = getBreadcrumbTrail(location.pathname)
 
   return (
     <Box
@@ -125,19 +160,54 @@ export default function Navbar({ handleDrawerToggle, pinned }: NavbarProps) {
                     alt={CAMPLAR_BRAND.name}
                     sx={{ width: { xs: 148, sm: 194 }, height: 'auto', display: 'block', flexShrink: 0 }}
                   />
-                  <Typography
-                    sx={{
-                      fontSize: '0.68rem',
-                      fontWeight: 800,
-                      letterSpacing: '0.18em',
-                      color: TEXT_SECONDARY,
-                      textTransform: 'uppercase',
-                      whiteSpace: 'nowrap',
-                      pl: 0.2,
-                    }}
+                  <Stack
+                    direction="row"
+                    spacing={0.8}
+                    alignItems="center"
+                    useFlexGap
+                    flexWrap="wrap"
+                    sx={{ pl: 0.2 }}
                   >
-                    {CAMPLAR_BRAND.tagLine}
-                  </Typography>
+                    {breadcrumbTrail.length > 0 ? (
+                      breadcrumbTrail.map((item, index) => (
+                        <Stack key={`${item}-${index}`} direction="row" spacing={0.8} alignItems="center">
+                          <Typography
+                            sx={{
+                              fontSize: '0.68rem',
+                              fontWeight: index === breadcrumbTrail.length - 1 ? 800 : 700,
+                              letterSpacing: '0.12em',
+                              color:
+                                index === breadcrumbTrail.length - 1
+                                  ? CAMPLAR_COLORS.secondary
+                                  : TEXT_SECONDARY,
+                              textTransform: 'uppercase',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {item}
+                          </Typography>
+                          {index < breadcrumbTrail.length - 1 && (
+                            <Typography sx={{ color: alpha(TEXT_SECONDARY, 0.6), fontSize: '0.74rem' }}>
+                              /
+                            </Typography>
+                          )}
+                        </Stack>
+                      ))
+                    ) : (
+                      <Typography
+                        sx={{
+                          fontSize: '0.68rem',
+                          fontWeight: 800,
+                          letterSpacing: '0.18em',
+                          color: TEXT_SECONDARY,
+                          textTransform: 'uppercase',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {CAMPLAR_BRAND.tagLine}
+                      </Typography>
+                    )}
+                  </Stack>
                 </Stack>
               </Box>
             </Stack>
@@ -196,6 +266,18 @@ export default function Navbar({ handleDrawerToggle, pinned }: NavbarProps) {
             }}
           >
             {showWideDesktopNav && <GlobalSearch />}
+
+            {showWideDesktopNav && (
+              <Chip
+                label="Ahmedabad hub"
+                sx={{
+                  fontWeight: 700,
+                  color: TEXT_PRIMARY,
+                  bgcolor: alpha(INK, 0.05),
+                  border: `1px solid ${alpha(INK, 0.08)}`,
+                }}
+              />
+            )}
 
             <Button
               variant="contained"

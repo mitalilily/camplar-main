@@ -27,11 +27,25 @@ export default function Layout() {
         width: '100%',
         height: '100vh',
         overflow: 'hidden',
+        position: 'relative',
         bgcolor: CAMPLAR_COLORS.surface,
         backgroundImage:
           'radial-gradient(circle at 12% 6%, rgba(0,29,103,0.12) 0%, transparent 30%), radial-gradient(circle at 88% 8%, rgba(255,94,20,0.12) 0%, transparent 26%), linear-gradient(180deg, #fbfcff 0%, #f7f9ff 52%, #eef5ff 100%)',
       }}
     >
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: { xs: '100%', lg: '46%' },
+          height: '100%',
+          pointerEvents: 'none',
+          background:
+            'linear-gradient(270deg, rgba(236,244,255,0.42) 0%, rgba(236,244,255,0.14) 36%, rgba(236,244,255,0) 100%)',
+        }}
+      />
+
       <KeyboardShortcuts />
 
       {isMobile ? (

@@ -1,6 +1,6 @@
-import { Box, Button, Stack, Step, StepLabel, Stepper } from '@mui/material'
+import { Box, Button, Grid, Stack, Step, StepLabel, Stepper, Typography, alpha } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { FormProvider, useForm, type FieldErrors } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import { BiRupee } from 'react-icons/bi'
 import { FaBox, FaFileInvoice, FaTruck, FaUser } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -14,6 +14,7 @@ import OptionalChargesForm from '../OptionalChargesForm'
 import OrderDetailsForm from '../OrderDetailsForm'
 import PickupLocationForm from '../PickupLocationForm'
 import { SelectCourierForm } from '../SelectCourierForm'
+import ShipmentFlowHeader from '../ShipmentFlowHeader'
 import B2BInvoicesForm from './B2BInvoicesForm'
 import B2BProductsForm from './B2BProductsForm'
 // Box structure - top level array
@@ -108,6 +109,8 @@ export type B2BFormData = {
 }
 
 export default function B2BOrderForm({ onClose }: { onClose?: () => void }) {
+  const ACCENT = '#0D3B8E'
+  const TEXT_MUTED = '#496189'
   const createShipmentMutation = useCreateB2BShipment(onClose)
   const navigate = useNavigate()
   const location = useLocation()
@@ -310,20 +313,63 @@ export default function B2BOrderForm({ onClose }: { onClose?: () => void }) {
 
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0))
 
+  const stepLabels = [
+    { title: 'Order & Delivery', caption: 'Receiver, invoices, and package details' },
+    { title: 'Pickup Location', caption: 'Pickup and RTO warehouse details' },
+    { title: 'Courier Selection', caption: 'Compare carriers and finalize the booking' },
+  ]
+
   useEffect(() => {
     setValue('orderAmount', totalCollectable, { shouldValidate: true })
   }, [totalCollectable])
 
   return (
     <FormProvider {...methods}>
-      <Stack gap={2} sx={{ height: '100%', position: 'relative' }}>
+      <Stack
+        gap={2}
+        sx={{
+          height: '100%',
+          position: 'relative',
+          p: { xs: 1.15, sm: 1.6, md: 2.2 },
+          borderRadius: 6,
+          border: `1px solid ${alpha(ACCENT, 0.14)}`,
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(247,249,255,0.94) 100%)',
+          boxShadow: `0 18px 40px ${alpha(ACCENT, 0.08)}`,
+        }}
+      >
+        <ShipmentFlowHeader
+          modeLabel="B2B Shipment"
+          title="Create Shipment"
+          subtitle="Coordinate invoice-backed dispatches with the same Camplar Nexus booking system, now tuned for box-level B2B operations."
+          currentStep={currentStep}
+          steps={stepLabels}
+        />
+
         <Box
           component="form"
           onSubmit={handleSubmit(onSubmit)}
-          sx={{ flex: 1, overflowY: 'auto', p: 2 }}
+          sx={{
+            flex: 1,
+            overflowY: 'auto',
+            p: { xs: 0.5, sm: 1, md: 1.5 },
+            pr: { xs: 1, sm: 2, md: 2.5 },
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: alpha(ACCENT, 0.35),
+              borderRadius: '999px',
+            },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: alpha(ACCENT, 0.08),
+              borderRadius: '999px',
+            },
+          }}
         >
           <Box
             sx={{
+              display: 'none',
               p: { xs: 2, sm: 3 },
               background: 'linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%)',
               borderRadius: '16px',
@@ -417,45 +463,45 @@ export default function B2BOrderForm({ onClose }: { onClose?: () => void }) {
           </Box>
 
           {currentStep === 0 && (
-            <Stack gap={2} mb={2}>
-              <FormSectionAccordion title="Order Details" icon={<FaBox />} defaultExpanded>
-                <OrderDetailsForm />
-              </FormSectionAccordion>
+            <Grid container spacing={2.2} mb={2}>
+              <Grid size={{ xs: 12, lg: 8 }}>
+                <Stack gap={2}>
+                  <FormSectionAccordion title="Order Details" icon={<FaBox />} defaultExpanded>
+                    <OrderDetailsForm />
+                  </FormSectionAccordion>
 
-              <FormSectionAccordion title="Recipient Details" icon={<FaUser />} defaultExpanded>
-                <DeliveryDetailsForm type="b2b" />
-              </FormSectionAccordion>
+                  <FormSectionAccordion title="Recipient Details" icon={<FaUser />} defaultExpanded>
+                    <DeliveryDetailsForm type="b2b" />
+                  </FormSectionAccordion>
 
-              {/* Boxes */}
-              <FormSectionAccordion title="Boxes" icon={<FaBox />} defaultExpanded>
-                <B2BProductsForm />
-              </FormSectionAccordion>
+                  <FormSectionAccordion title="Boxes" icon={<FaBox />} defaultExpanded>
+                    <B2BProductsForm />
+                  </FormSectionAccordion>
 
-              {/* Invoices */}
-              <FormSectionAccordion title="Invoices" icon={<FaFileInvoice />} defaultExpanded>
-                <B2BInvoicesForm />
-              </FormSectionAccordion>
+                  <FormSectionAccordion title="Invoices" icon={<FaFileInvoice />} defaultExpanded>
+                    <B2BInvoicesForm />
+                  </FormSectionAccordion>
 
-              {/* Products */}
-              <FormSectionAccordion title="Products & Boxes" icon={<FaBox />} defaultExpanded>
-                <B2BProductsForm />
-              </FormSectionAccordion>
+                  <FormSectionAccordion
+                    title="Optional Charges & Summary"
+                    icon={<BiRupee />}
+                    defaultExpanded
+                  >
+                    <OptionalChargesForm />
+                  </FormSectionAccordion>
+                </Stack>
+              </Grid>
 
-              <FormSectionAccordion
-                title="Optional Charges & Summary"
-                icon={<BiRupee />}
-                defaultExpanded
-              >
-                <OptionalChargesForm />
-              </FormSectionAccordion>
-
-              <AmountSummaryCard
-                subtotal={subtotal}
-                totalCollectable={totalCollectable}
-                totalOrderValue={totalOrderValue}
-                errors={errors as FieldErrors<B2BFormData>}
-              />
-            </Stack>
+              <Grid size={{ xs: 12, lg: 4 }}>
+                <AmountSummaryCard
+                  subtotal={subtotal}
+                  totalCollectable={totalCollectable}
+                  totalOrderValue={totalOrderValue}
+                  errors={errors as unknown as Record<string, unknown>}
+                  variant="sidebar"
+                />
+              </Grid>
+            </Grid>
           )}
 
           {currentStep === 1 && <PickupLocationForm />}
@@ -468,29 +514,55 @@ export default function B2BOrderForm({ onClose }: { onClose?: () => void }) {
 
           <Box
             sx={{
-              py: 2,
-              px: 2,
+              py: 1.5,
+              px: { xs: 1.5, sm: 2.25 },
               background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              borderRadius: '15px',
+              border: `1px solid ${alpha(ACCENT, 0.16)}`,
+              borderRadius: '14px',
               position: 'sticky',
               bottom: 0,
               zIndex: 10,
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              mt: 2.5,
+              boxShadow: `0 10px 20px ${alpha(ACCENT, 0.08)}`,
             }}
           >
-            <Stack direction="row" justifyContent="space-between">
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              justifyContent="space-between"
+              alignItems={{ xs: 'stretch', sm: 'center' }}
+              gap={1.5}
+            >
+              <Typography variant="body2" sx={{ color: TEXT_MUTED, fontWeight: 600 }}>
+                {steps[currentStep]}{' '}
+                {currentStep < 2
+                  ? `- next up: ${stepLabels[currentStep + 1]?.title ?? 'Courier confirmation'}`
+                  : '- booking is ready for final confirmation'}
+              </Typography>
               {currentStep > 0 && (
                 <Button
                   loading={createShipmentMutation?.isPending}
                   variant="outlined"
                   onClick={prevStep}
+                  sx={{
+                    minWidth: { xs: '100%', sm: 120 },
+                    borderColor: alpha(ACCENT, 0.35),
+                    color: ACCENT,
+                    '&:hover': { borderColor: ACCENT, backgroundColor: alpha(ACCENT, 0.07) },
+                  }}
                 >
                   Back
                 </Button>
               )}
               {currentStep < 2 ? (
-                <Button variant="contained" onClick={nextStep}>
+                <Button
+                  variant="contained"
+                  onClick={nextStep}
+                  sx={{
+                    minWidth: { xs: '100%', sm: 130 },
+                    fontWeight: 700,
+                    background: ACCENT,
+                  }}
+                >
                   Next
                 </Button>
               ) : (
@@ -500,6 +572,11 @@ export default function B2BOrderForm({ onClose }: { onClose?: () => void }) {
                   onClick={handleSubmit(onSubmit)}
                   color="primary"
                   loading={createShipmentMutation?.isPending}
+                  sx={{
+                    minWidth: { xs: '100%', sm: 210 },
+                    fontWeight: 800,
+                    background: ACCENT,
+                  }}
                 >
                   Create & Book Order
                 </Button>

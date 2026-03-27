@@ -13,11 +13,12 @@ interface FormSectionAccordionProps {
 }
 
 export const glassStyles = {
-  background: '#FFFFFF',
-  borderRadius: 3,
+  background:
+    'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(247,249,255,0.94) 100%)',
+  borderRadius: 5,
   mb: 2,
   border: `1px solid ${alpha(BRAND_PRIMARY, 0.12)}`,
-  boxShadow: `0 4px 14px ${alpha(BRAND_PRIMARY, 0.06)}`,
+  boxShadow: `0 18px 34px ${alpha(BRAND_PRIMARY, 0.06)}`,
   overflow: 'hidden',
   color: '#1a1a1a',
   '&:before': {
@@ -37,9 +38,12 @@ const FormSectionAccordion: React.FC<FormSectionAccordionProps> = ({
       <AccordionSummary
         expandIcon={<MdExpandMore color={BRAND_PRIMARY} />}
         sx={{
-          backgroundColor: alpha(BRAND_PRIMARY, 0.03),
-          px: 2.5,
-          py: 1.5,
+          background: `
+            radial-gradient(circle at top right, ${alpha(BRAND_PRIMARY, 0.08)} 0%, transparent 22%),
+            linear-gradient(180deg, ${alpha(BRAND_PRIMARY, 0.045)} 0%, ${alpha(BRAND_PRIMARY, 0.02)} 100%)
+          `,
+          px: 2.6,
+          py: 1.7,
           transition: 'all 0.2s ease',
           '&:hover': {
             backgroundColor: alpha(BRAND_PRIMARY, 0.06),
@@ -60,7 +64,8 @@ const FormSectionAccordion: React.FC<FormSectionAccordionProps> = ({
             alignItems="center"
             sx={{
               color: '#102A54',
-              fontSize: { xs: '0.95rem', sm: '1rem' },
+              fontSize: { xs: '1rem', sm: '1.04rem' },
+              letterSpacing: '-0.02em',
             }}
           >
             {icon && <span style={{ marginRight: 8, display: 'flex', alignItems: 'center' }}>{icon}</span>}
@@ -75,9 +80,9 @@ const FormSectionAccordion: React.FC<FormSectionAccordionProps> = ({
       </AccordionSummary>
       <AccordionDetails
         sx={{
-          px: 2.5,
-          py: 2.5,
-          backgroundColor: '#FFFFFF',
+          px: 2.6,
+          py: 2.6,
+          backgroundColor: 'rgba(255,255,255,0.82)',
         }}
       >
         {children}

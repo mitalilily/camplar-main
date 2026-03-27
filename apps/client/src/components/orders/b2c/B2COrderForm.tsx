@@ -1,6 +1,6 @@
-import { Alert, Box, Button, Chip, Paper, Stack, Typography, alpha } from '@mui/material'
+import { Alert, Box, Button, Grid, Stack, Typography, alpha } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { FormProvider, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
+import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { BiRupee } from 'react-icons/bi'
 import { FaBox, FaTruck, FaUser } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -15,11 +15,11 @@ import OptionalChargesForm from '../OptionalChargesForm'
 import OrderDetailsForm from '../OrderDetailsForm'
 import PickupLocationForm from '../PickupLocationForm'
 import { SelectCourierForm } from '../SelectCourierForm'
+import ShipmentFlowHeader from '../ShipmentFlowHeader'
 import PackageDetailsForm from './PackageDetailsForm'
 import PackageDimensionsForm from './PackageDimensionsForm'
 
 const ACCENT = '#0D3B8E'
-const TEXT_PRIMARY = '#102A54'
 const TEXT_MUTED = '#496189'
 
 export type Product = {
@@ -342,8 +342,6 @@ export default function B2COrderFormSteps({ onClose }: { onClose?: () => void })
     { title: 'Courier Selection', caption: 'Choose the best shipping partner' },
   ]
 
-  const stepCompletion = ((currentStep + 1) / stepLabels.length) * 100
-
   useEffect(() => {
     setValue('orderAmount', totalCollectable, { shouldValidate: true })
   }, [totalCollectable])
@@ -361,69 +359,21 @@ export default function B2COrderFormSteps({ onClose }: { onClose?: () => void })
         sx={{
           height: '100%',
           position: 'relative',
-          p: { xs: 1, sm: 1.5, md: 2 },
-          borderRadius: 4,
+          p: { xs: 1.15, sm: 1.6, md: 2.2 },
+          borderRadius: 6,
           border: `1px solid ${alpha(ACCENT, 0.14)}`,
-          background: '#ffffff',
-          boxShadow: `0 12px 30px ${alpha(ACCENT, 0.08)}`,
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(247,249,255,0.94) 100%)',
+          boxShadow: `0 18px 40px ${alpha(ACCENT, 0.08)}`,
         }}
       >
-        <Paper
-          elevation={0}
-          sx={{
-            px: { xs: 2, sm: 2.5, md: 3 },
-            py: { xs: 2, sm: 2.25 },
-            borderRadius: 3,
-            border: `1px solid ${alpha(ACCENT, 0.14)}`,
-            background: alpha(ACCENT, 0.03),
-          }}
-        >
-          <Stack gap={1}>
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              justifyContent="space-between"
-              alignItems={{ xs: 'flex-start', sm: 'center' }}
-              gap={1}
-            >
-              <Typography variant="h6" fontWeight={800} sx={{ color: TEXT_PRIMARY }}>
-                B2C Order Creation
-              </Typography>
-              <Chip
-                label={`Step ${currentStep + 1} of ${stepLabels.length}`}
-                size="small"
-                sx={{
-                  fontWeight: 700,
-                  color: TEXT_PRIMARY,
-                  backgroundColor: '#ffffff',
-                  border: `1px solid ${alpha(ACCENT, 0.2)}`,
-                }}
-              />
-            </Stack>
-            <Typography variant="body2" sx={{ color: TEXT_MUTED }}>
-              Build shipments faster with a guided flow. Only the active step is editable.
-            </Typography>
-            <Box
-              sx={{
-                mt: 0.5,
-                width: '100%',
-                height: 8,
-                borderRadius: 99,
-                overflow: 'hidden',
-                bgcolor: alpha(ACCENT, 0.08),
-                border: `1px solid ${alpha(ACCENT, 0.12)}`,
-              }}
-            >
-              <Box
-                sx={{
-                  width: `${stepCompletion}%`,
-                  height: '100%',
-                  transition: 'width 240ms ease',
-                  background: ACCENT,
-                }}
-              />
-            </Box>
-          </Stack>
-        </Paper>
+        <ShipmentFlowHeader
+          modeLabel="B2C Shipment"
+          title="Create Shipment"
+          subtitle="Capture recipient details, validate serviceability, and move from order intake to courier booking with the Camplar Nexus flow."
+          currentStep={currentStep}
+          steps={stepLabels}
+        />
 
         <Box
           component="form"
@@ -446,104 +396,52 @@ export default function B2COrderFormSteps({ onClose }: { onClose?: () => void })
             },
           }}
         >
-          <Stack direction={{ xs: 'column', md: 'row' }} gap={1.25} mb={2.5}>
-            {stepLabels.map((step, index) => {
-              const isActive = index === currentStep
-              const isCompleted = index < currentStep
-              return (
-                <Paper
-                  key={step.title}
-                  elevation={0}
-                  sx={{
-                    flex: 1,
-                    px: 1.5,
-                    py: 1.25,
-                    borderRadius: 2.5,
-                    border: `1px solid ${
-                      isActive
-                        ? alpha(ACCENT, 0.3)
-                        : isCompleted
-                        ? alpha(ACCENT, 0.2)
-                        : alpha('#64748B', 0.25)
-                    }`,
-                    background: isActive
-                      ? alpha(ACCENT, 0.08)
-                      : isCompleted
-                      ? alpha(ACCENT, 0.05)
-                      : '#ffffff',
-                    boxShadow: isActive ? `0 8px 20px ${alpha(ACCENT, 0.12)}` : 'none',
-                    transition: 'all 200ms ease',
-                  }}
-                >
-                  <Stack direction="row" gap={1.25} alignItems="center">
-                    <Box
-                      sx={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: '50%',
-                        display: 'grid',
-                        placeItems: 'center',
-                        fontWeight: 800,
-                        fontSize: '0.85rem',
-                        color: isActive || isCompleted ? '#fff' : '#6b7280',
-                        bgcolor: isActive ? ACCENT : isCompleted ? alpha(ACCENT, 0.75) : '#f1f5f9',
-                      }}
-                    >
-                      {index + 1}
-                    </Box>
-                    <Stack spacing={0.1}>
-                      <Typography variant="body2" fontWeight={700} sx={{ color: TEXT_PRIMARY }}>
-                        {step.title}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: TEXT_MUTED, lineHeight: 1.3 }}>
-                        {step.caption}
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </Paper>
-              )
-            })}
-          </Stack>
-
           {/* Step content */}
           {currentStep === 0 && (
-            <Stack gap={2} mb={2}>
-              <FormSectionAccordion title="Order Details" icon={<FaBox />} defaultExpanded>
-                <OrderDetailsForm />
-              </FormSectionAccordion>
+            <Grid container spacing={2.2} mb={2}>
+              <Grid size={{ xs: 12, lg: 8 }}>
+                <Stack gap={2}>
+                  <FormSectionAccordion title="Order Details" icon={<FaBox />} defaultExpanded>
+                    <OrderDetailsForm />
+                  </FormSectionAccordion>
 
-              <FormSectionAccordion title="Recipient Details" icon={<FaUser />} defaultExpanded>
-                <DeliveryDetailsForm />
-              </FormSectionAccordion>
+                  <FormSectionAccordion title="Recipient Details" icon={<FaUser />} defaultExpanded>
+                    <DeliveryDetailsForm />
+                  </FormSectionAccordion>
 
-              <FormSectionAccordion title="Products" icon={<FaBox />} defaultExpanded>
-                <PackageDetailsForm
-                  append={append}
-                  control={control}
-                  fields={fields}
-                  remove={remove}
+                  <FormSectionAccordion title="Products" icon={<FaBox />} defaultExpanded>
+                    <PackageDetailsForm
+                      append={append}
+                      control={control}
+                      fields={fields}
+                      remove={remove}
+                    />
+                  </FormSectionAccordion>
+
+                  <FormSectionAccordion defaultExpanded title="Package Details" icon={<FaBox />}>
+                    <PackageDimensionsForm />
+                  </FormSectionAccordion>
+
+                  <FormSectionAccordion
+                    title="Optional Charges & Summary"
+                    icon={<BiRupee />}
+                    defaultExpanded
+                  >
+                    <OptionalChargesForm />
+                  </FormSectionAccordion>
+                </Stack>
+              </Grid>
+
+              <Grid size={{ xs: 12, lg: 4 }}>
+                <AmountSummaryCard
+                  subtotal={subtotal}
+                  totalCollectable={totalCollectable}
+                  totalOrderValue={totalOrderValue}
+                  errors={errors as unknown as Record<string, unknown>}
+                  variant="sidebar"
                 />
-              </FormSectionAccordion>
-
-              <FormSectionAccordion defaultExpanded title="Package Details" icon={<FaBox />}>
-                <PackageDimensionsForm />
-              </FormSectionAccordion>
-
-              <FormSectionAccordion
-                title="Optional Charges & Summary"
-                icon={<BiRupee />}
-                defaultExpanded
-              >
-                <OptionalChargesForm />
-              </FormSectionAccordion>
-
-              <AmountSummaryCard
-                subtotal={subtotal}
-                totalCollectable={totalCollectable}
-                totalOrderValue={totalOrderValue}
-                errors={errors as FieldErrors<B2CFormData>}
-              />
-            </Stack>
+              </Grid>
+            </Grid>
           )}
 
           {currentStep === 1 && <PickupLocationForm />}
@@ -582,7 +480,10 @@ export default function B2COrderFormSteps({ onClose }: { onClose?: () => void })
               gap={1.5}
             >
               <Typography variant="body2" sx={{ color: TEXT_MUTED, fontWeight: 600 }}>
-                {steps[currentStep]}
+                {steps[currentStep]}{' '}
+                {currentStep < 2
+                  ? `- next up: ${stepLabels[currentStep + 1]?.title ?? 'Courier confirmation'}`
+                  : '- booking is ready for final confirmation'}
               </Typography>
               {currentStep > 0 && (
                 <Button
