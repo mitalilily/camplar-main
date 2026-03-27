@@ -1,347 +1,546 @@
-import { alpha, Box, Grid, Stack, Typography } from '@mui/material'
+import { useGoogleLogin } from '@react-oauth/google'
+import { alpha, Box, Button, Divider, Link, Stack, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
-import { TbMap2, TbShieldCheck, TbSparkles, TbTruckDelivery } from 'react-icons/tb'
-import { DoorstepCourierScene, RollingVanScene } from '../branding/AnimatedCourierScene'
+import { FaMicrosoft } from 'react-icons/fa6'
+import { type ReactNode } from 'react'
+import { FiMail } from 'react-icons/fi'
+import { SiGoogle } from 'react-icons/si'
+import { TbRoute2, TbShieldCheck, TbWorld } from 'react-icons/tb'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/auth/AuthContext'
+import { useGoogleLoginMutation } from '../../hooks/useOTP'
 import { CAMPLAR_BRAND, CAMPLAR_COLORS, CAMPLAR_FONTS } from '../../utils/brand'
+import { toast } from '../UI/Toast'
 import PhoneForm from './PhoneForm'
+import { getAuthErrorMessage } from './getAuthErrorMessage'
 
-const NAVY = CAMPLAR_COLORS.primary
-const NAVY_SOFT = CAMPLAR_COLORS.primarySoft
-const ORANGE = CAMPLAR_COLORS.secondaryBright
-const ORANGE_DEEP = CAMPLAR_COLORS.secondary
-const SURFACE = CAMPLAR_COLORS.surface
-const SURFACE_LOW = CAMPLAR_COLORS.surfaceLow
-const TEXT = CAMPLAR_COLORS.text
-const MUTED = CAMPLAR_COLORS.textMuted
-const TYPEFACE = CAMPLAR_FONTS.heading
-const currentYear = new Date().getFullYear()
-
-const featureCards = [
-  {
-    title: 'Real-time Velocity',
-    text: 'Instant updates across every order, courier lane, and delivery touchpoint.',
-    icon: <TbTruckDelivery size={18} />,
-  },
-  {
-    title: 'Enterprise Security',
-    text: 'Inline verification and controlled access for daily logistics operations.',
-    icon: <TbShieldCheck size={18} />,
-  },
+const heroStats = [
+  { value: '42.8k', label: 'Daily Shipments' },
+  { value: '99.9%', label: 'Uptime SLA' },
 ]
+
+const heroSignals = [
+  { label: 'Editorial access flow', icon: <TbShieldCheck size={16} /> },
+  { label: 'Real-time visibility', icon: <TbWorld size={16} /> },
+  { label: 'One logistics desk', icon: <TbRoute2 size={16} /> },
+]
+
+interface SocialButtonProps {
+  label: string
+  icon: ReactNode
+  onClick: () => void
+  disabled?: boolean
+}
+
+function SocialButton({ label, icon, onClick, disabled = false }: SocialButtonProps) {
+  return (
+    <Button
+      fullWidth
+      disabled={disabled}
+      onClick={onClick}
+      sx={{
+        minHeight: 54,
+        borderRadius: 4,
+        px: 2.2,
+        justifyContent: 'center',
+        gap: 1.2,
+        textTransform: 'none',
+        fontWeight: 700,
+        fontSize: '0.95rem',
+        color: CAMPLAR_COLORS.text,
+        border: `1px solid ${alpha(CAMPLAR_COLORS.primary, 0.1)}`,
+        background: `
+          linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(236,244,255,0.9) 100%)
+        `,
+        boxShadow: `0 10px 24px ${alpha(CAMPLAR_COLORS.text, 0.05)}`,
+        '&:hover': {
+          background: `
+            linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(246,250,255,1) 100%)
+          `,
+          borderColor: alpha(CAMPLAR_COLORS.primarySoft, 0.2),
+        },
+        '&:disabled': {
+          color: alpha(CAMPLAR_COLORS.text, 0.45),
+          borderColor: alpha(CAMPLAR_COLORS.primary, 0.06),
+        },
+      }}
+    >
+      <Box sx={{ display: 'inline-flex', fontSize: '1rem' }}>{icon}</Box>
+      <Typography component="span" sx={{ fontWeight: 700, color: 'inherit' }}>
+        {label}
+      </Typography>
+    </Button>
+  )
+}
+
+function GoogleAuthButton() {
+  const navigate = useNavigate()
+  const { setTokens, setUserId } = useAuth()
+  const { mutate: googleLogin, isPending } = useGoogleLoginMutation()
+
+  const launchGoogle = useGoogleLogin({
+    flow: 'auth-code',
+    onSuccess: ({ code }) => {
+      googleLogin(code, {
+        onSuccess: ({ token, refreshToken, user }) => {
+          if (user?.email) {
+            sessionStorage.setItem('activeEmail', user.email)
+          }
+          setUserId(user?.id)
+          setTokens(token, refreshToken)
+          navigate('/onboarding-questions', { replace: true })
+        },
+        onError: (error: unknown) => {
+          toast.open({
+            message: getAuthErrorMessage(error, 'Google sign-in failed'),
+            severity: 'error',
+            position: { vertical: 'top', horizontal: 'center' },
+          })
+        },
+      })
+    },
+    onError: () => {
+      toast.open({
+        message: 'Google sign-in was cancelled or could not be started.',
+        severity: 'warning',
+        position: { vertical: 'top', horizontal: 'center' },
+      })
+    },
+  })
+
+  return (
+    <SocialButton
+      label={isPending ? 'Connecting...' : 'Google'}
+      icon={<SiGoogle />}
+      onClick={() => launchGoogle()}
+      disabled={isPending}
+    />
+  )
+}
+
+function GoogleButton() {
+  const hasGoogleClientId = Boolean(import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID)
+
+  if (hasGoogleClientId) {
+    return <GoogleAuthButton />
+  }
+
+  return (
+    <SocialButton
+      label="Google"
+      icon={<SiGoogle />}
+      onClick={() =>
+        toast.open({
+          message: 'Google sign-in is not configured for this environment yet.',
+          severity: 'info',
+          position: { vertical: 'top', horizontal: 'center' },
+        })
+      }
+    />
+  )
+}
 
 export default function LoginForm() {
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: SURFACE,
         background: `
-          radial-gradient(720px 280px at 0% 0%, ${alpha(CAMPLAR_COLORS.surfaceHigh, 0.88)} 0%, transparent 58%),
-          radial-gradient(560px 240px at 100% 0%, ${alpha(ORANGE, 0.11)} 0%, transparent 44%),
-          linear-gradient(180deg, ${alpha('#FFFFFF', 0.96)} 0%, ${SURFACE} 100%)
+          radial-gradient(960px 340px at 0% 0%, ${alpha(CAMPLAR_COLORS.primarySoft, 0.13)} 0%, transparent 55%),
+          radial-gradient(760px 260px at 100% 0%, ${alpha(CAMPLAR_COLORS.secondaryBright, 0.14)} 0%, transparent 52%),
+          linear-gradient(180deg, #fbfcff 0%, ${CAMPLAR_COLORS.surface} 45%, #eef5ff 100%)
         `,
+        '@keyframes loginHeroFloat': {
+          '0%': { transform: 'scale(1) translate3d(0, 0, 0)' },
+          '100%': { transform: 'scale(1.08) translate3d(-2%, -1.5%, 0)' },
+        },
       }}
     >
-      <Grid container sx={{ minHeight: '100vh' }}>
-        <Grid
-          size={{ xs: 12, md: 6 }}
+      <Box
+        component={motion.div}
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, ease: 'easeOut' }}
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+        }}
+      >
+        <Box
           sx={{
             display: { xs: 'none', md: 'flex' },
+            width: { md: '48%', lg: '58%' },
             position: 'relative',
             overflow: 'hidden',
-            color: '#ffffff',
-            background: `linear-gradient(135deg, ${NAVY} 0%, ${NAVY_SOFT} 100%)`,
-            px: { md: 5, lg: 7 },
-            py: { md: 5, lg: 6 },
-            flexDirection: 'column',
-            justifyContent: 'space-between',
+            background: `linear-gradient(135deg, ${CAMPLAR_COLORS.primary} 0%, ${CAMPLAR_COLORS.primarySoft} 100%)`,
           }}
         >
+          <Box
+            component="img"
+            src="/images/logistics-bg.png"
+            alt="Camplar logistics operations background"
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              opacity: 0.28,
+              animation: 'loginHeroFloat 28s ease-in-out infinite alternate',
+            }}
+          />
           <Box
             sx={{
               position: 'absolute',
               inset: 0,
-              opacity: 0.22,
-              pointerEvents: 'none',
+              background: `
+                radial-gradient(420px 220px at 0% 0%, rgba(255,255,255,0.12) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(0,11,55,0.2) 0%, rgba(0,29,103,0.12) 100%)
+              `,
             }}
-          >
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '-12%',
-                right: '-14%',
-                width: 420,
-                height: 420,
-                borderRadius: '50%',
-                bgcolor: alpha(ORANGE_DEEP, 0.9),
-                filter: 'blur(100px)',
-              }}
-            />
-            <Box
-              sx={{
-                position: 'absolute',
-                bottom: '-10%',
-                left: '-10%',
-                width: 320,
-                height: 320,
-                borderRadius: '50%',
-                bgcolor: alpha('#FFFFFF', 0.18),
-                filter: 'blur(90px)',
-              }}
-            />
-          </Box>
+          />
 
-          <Stack spacing={5} sx={{ position: 'relative', zIndex: 1 }}>
-            <Stack direction="row" spacing={1.6} alignItems="center">
-              <Box
-                sx={{
-                  width: 46,
-                  height: 46,
-                  borderRadius: 2.5,
-                  bgcolor: alpha(ORANGE_DEEP, 0.92),
-                  display: 'grid',
-                  placeItems: 'center',
-                  boxShadow: `0 18px 42px ${alpha(ORANGE_DEEP, 0.26)}`,
-                }}
-              >
-                <Box component="img" src={CAMPLAR_BRAND.logoMark} alt={CAMPLAR_BRAND.name} sx={{ width: 24 }} />
-              </Box>
-              <Typography
-                sx={{
-                  fontFamily: TYPEFACE,
-                  fontSize: '2rem',
-                  fontWeight: 900,
-                  letterSpacing: '-0.05em',
-                }}
-              >
-                {CAMPLAR_BRAND.name}
-              </Typography>
-            </Stack>
-
-            <Box sx={{ maxWidth: 560 }}>
-              <Typography
-                sx={{
-                  fontFamily: TYPEFACE,
-                  fontSize: { md: '3.1rem', lg: '4rem' },
-                  fontWeight: 900,
-                  lineHeight: 1.02,
-                  letterSpacing: '-0.05em',
-                  mb: 2.2,
-                }}
-              >
-                Navigate global logistics
-                <Box component="span" sx={{ display: 'block', color: alpha('#FFFFFF', 0.74) }}>
-                  with kinetic precision.
-                </Box>
-              </Typography>
-              <Typography
-                sx={{
-                  color: alpha('#FFFFFF', 0.74),
-                  fontSize: '1.02rem',
-                  lineHeight: 1.8,
-                  maxWidth: 500,
-                }}
-              >
-                Join enterprise shipping teams using Camplar to monitor dispatch, track delivery
-                movement, and manage daily logistics from one refined operations workspace.
-              </Typography>
-            </Box>
-
-            <RollingVanScene compact />
-
-            <Grid container spacing={2}>
-              {featureCards.map((card) => (
-                <Grid key={card.title} size={{ xs: 12, lg: 6 }}>
-                  <Box
-                    component={motion.div}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.45, ease: 'easeOut' }}
-                    sx={{
-                      height: '100%',
-                      borderRadius: 3,
-                      px: 2.5,
-                      py: 2.4,
-                      border: `1px solid ${alpha('#FFFFFF', 0.12)}`,
-                      backgroundColor: alpha('#FFFFFF', 0.1),
-                      backdropFilter: 'blur(22px)',
-                    }}
-                  >
-                    <Box sx={{ color: alpha('#FFDBCF', 0.96), mb: 1.3, display: 'inline-flex' }}>
-                      {card.icon}
-                    </Box>
-                    <Typography sx={{ fontWeight: 800, fontSize: '1rem', mb: 0.6 }}>
-                      {card.title}
-                    </Typography>
-                    <Typography sx={{ color: alpha('#FFFFFF', 0.66), fontSize: '0.84rem', lineHeight: 1.7 }}>
-                      {card.text}
-                    </Typography>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </Stack>
-
-          <Typography
+          <Stack
             sx={{
               position: 'relative',
               zIndex: 1,
-              color: alpha('#FFFFFF', 0.42),
-              fontSize: '0.7rem',
-              fontWeight: 700,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              mt: 3,
+              width: '100%',
+              p: { md: 5, lg: 8 },
+              justifyContent: 'space-between',
             }}
           >
-            © {currentYear} Camplar Kinetic. All rights reserved.
-          </Typography>
-        </Grid>
-
-        <Grid
-          size={{ xs: 12, md: 6 }}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            px: { xs: 2.5, sm: 4, md: 5, lg: 7 },
-            py: { xs: 4.5, sm: 5.5, md: 6 },
-            bgcolor: alpha('#FFFFFF', 0.82),
-          }}
-        >
-          <Box sx={{ width: '100%', maxWidth: 540 }}>
-            <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 4.5 }}>
-              <Stack direction="row" spacing={1.4} alignItems="center" mb={2.5}>
-                <Box
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 2,
-                    bgcolor: ORANGE_DEEP,
-                    display: 'grid',
-                    placeItems: 'center',
-                  }}
-                >
-                  <Box component="img" src={CAMPLAR_BRAND.logoMark} alt={CAMPLAR_BRAND.name} sx={{ width: 20 }} />
-                </Box>
-                <Typography
-                  sx={{
-                    fontFamily: TYPEFACE,
-                    fontWeight: 900,
-                    fontSize: '1.55rem',
-                    color: NAVY,
-                    letterSpacing: '-0.05em',
-                  }}
-                >
-                  {CAMPLAR_BRAND.name}
-                </Typography>
-              </Stack>
-              <DoorstepCourierScene compact />
-            </Box>
-
-            <Stack spacing={1.5} mb={3.2}>
-              <Stack direction="row" spacing={1.1} alignItems="center">
-                <Box
-                  sx={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 2,
-                    bgcolor: alpha(ORANGE_DEEP, 0.1),
-                    color: ORANGE_DEEP,
-                    display: 'grid',
-                    placeItems: 'center',
-                  }}
-                >
-                  <TbSparkles size={18} />
-                </Box>
-                <Typography
-                  sx={{
-                    color: ORANGE_DEEP,
-                    fontSize: '0.76rem',
-                    fontWeight: 800,
-                    letterSpacing: '0.18em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Client Sign In
-                </Typography>
-              </Stack>
-
-              <Typography
-                sx={{
-                  fontFamily: TYPEFACE,
-                  fontSize: { xs: '2rem', sm: '2.5rem' },
-                  fontWeight: 900,
-                  color: NAVY,
-                  letterSpacing: '-0.05em',
-                  lineHeight: 1.02,
-                }}
-              >
-                Welcome Back
-              </Typography>
-
-              <Typography sx={{ color: MUTED, lineHeight: 1.8, maxWidth: 460 }}>
-                Sign in with one-time passcode or password to access your Camplar dashboard,
-                manage shipments, and keep every parcel lane in motion.
-              </Typography>
-
-              <Stack direction="row" spacing={1.2} useFlexGap flexWrap="wrap">
-                {[
-                  { label: 'Live ops access', icon: <TbTruckDelivery size={15} /> },
-                  { label: 'Inline verification', icon: <TbShieldCheck size={15} /> },
-                  { label: 'Global visibility', icon: <TbMap2 size={15} /> },
-                ].map((pill) => (
+            <Stack spacing={3.5}>
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                {heroSignals.map((signal) => (
                   <Box
-                    key={pill.label}
+                    key={signal.label}
                     sx={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: 0.9,
+                      gap: 0.8,
                       px: 1.6,
-                      py: 1,
+                      py: 0.9,
                       borderRadius: 999,
-                      bgcolor: alpha(SURFACE_LOW, 0.95),
-                      border: `1px solid ${alpha(NAVY, 0.08)}`,
-                      color: TEXT,
+                      border: `1px solid ${alpha('#FFFFFF', 0.12)}`,
+                      backgroundColor: alpha('#FFFFFF', 0.08),
+                      color: alpha('#FFFFFF', 0.78),
                     }}
                   >
-                    <Box sx={{ color: ORANGE_DEEP, display: 'flex' }}>{pill.icon}</Box>
-                    <Typography sx={{ fontSize: '0.78rem', fontWeight: 700 }}>{pill.label}</Typography>
+                    <Box sx={{ display: 'inline-flex' }}>{signal.icon}</Box>
+                    <Typography sx={{ fontSize: '0.77rem', fontWeight: 700 }}>
+                      {signal.label}
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 3,
+                    backgroundColor: '#FFFFFF',
+                    display: 'grid',
+                    placeItems: 'center',
+                    boxShadow: '0 18px 40px rgba(0, 0, 0, 0.18)',
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={CAMPLAR_BRAND.logoMark}
+                    alt={CAMPLAR_BRAND.name}
+                    sx={{ width: 30, height: 30 }}
+                  />
+                </Box>
+                <Stack spacing={0.2}>
+                  <Typography
+                    sx={{
+                      fontFamily: CAMPLAR_FONTS.heading,
+                      fontWeight: 800,
+                      fontSize: '2rem',
+                      color: '#FFFFFF',
+                      letterSpacing: '-0.04em',
+                    }}
+                  >
+                    {CAMPLAR_BRAND.name}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.18em',
+                      textTransform: 'uppercase',
+                      color: alpha('#FFFFFF', 0.62),
+                    }}
+                  >
+                    Global Operations
+                  </Typography>
+                </Stack>
+              </Stack>
+
+              <Stack spacing={2.2} sx={{ maxWidth: 560 }}>
+                <Typography
+                  sx={{
+                    fontFamily: CAMPLAR_FONTS.heading,
+                    fontWeight: 800,
+                    fontSize: { md: '3.4rem', lg: '4.25rem' },
+                    lineHeight: 0.98,
+                    color: '#FFFFFF',
+                    letterSpacing: '-0.05em',
+                  }}
+                >
+                  The Kinetic
+                  <Box component="span" sx={{ display: 'block', color: alpha('#FFFFFF', 0.84) }}>
+                    Navigator.
+                  </Box>
+                </Typography>
+
+                <Typography
+                  sx={{
+                    maxWidth: 430,
+                    fontSize: { md: '1rem', lg: '1.1rem' },
+                    lineHeight: 1.8,
+                    color: alpha('#FFFFFF', 0.76),
+                  }}
+                >
+                  Streamlining global commerce through intuitive logistics data and real-time
+                  shipping narratives.
+                </Typography>
+              </Stack>
+
+              <Stack
+                direction={{ md: 'column', lg: 'row' }}
+                spacing={1.6}
+                sx={{
+                  maxWidth: 480,
+                }}
+              >
+                {heroStats.map((item) => (
+                  <Box
+                    key={item.label}
+                    sx={{
+                      flex: 1,
+                      minWidth: 0,
+                      borderRadius: 4,
+                      px: 2.4,
+                      py: 2,
+                      backdropFilter: 'blur(18px)',
+                      border: `1px solid ${alpha('#FFFFFF', 0.12)}`,
+                      backgroundColor: alpha('#FFFFFF', 0.08),
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontFamily: CAMPLAR_FONTS.heading,
+                        fontSize: '2rem',
+                        fontWeight: 800,
+                        color: '#FFB59B',
+                        letterSpacing: '-0.04em',
+                      }}
+                    >
+                      {item.value}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        mt: 0.8,
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.18em',
+                        color: alpha('#FFFFFF', 0.54),
+                      }}
+                    >
+                      {item.label}
+                    </Typography>
                   </Box>
                 ))}
               </Stack>
             </Stack>
 
-            <Box
+            <Typography
               sx={{
-                borderRadius: 5,
-                p: { xs: 2.1, sm: 2.8 },
-                border: `1px solid ${alpha(NAVY, 0.1)}`,
-                background: `
-                  radial-gradient(260px 120px at 0% 0%, ${alpha(CAMPLAR_COLORS.surfaceHigh, 0.68)} 0%, transparent 76%),
-                  radial-gradient(220px 120px at 100% 0%, ${alpha(ORANGE, 0.11)} 0%, transparent 74%),
-                  linear-gradient(180deg, ${alpha('#FFFFFF', 0.98)} 0%, ${alpha(SURFACE, 0.95)} 100%)
-                `,
-                boxShadow: `0 20px 48px ${alpha(TEXT, 0.08)}`,
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.2em',
+                color: alpha('#FFFFFF', 0.42),
               }}
             >
-              <PhoneForm />
+              © 2026 Camplar Kinetic
+            </Typography>
+          </Stack>
+        </Box>
+
+        <Box
+          sx={{
+            flex: 1,
+            px: { xs: 2.4, sm: 4.5, md: 5, lg: 8 },
+            py: { xs: 4.5, sm: 6, md: 5 },
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            backgroundColor: alpha('#FFFFFF', 0.86),
+            backdropFilter: 'blur(16px)',
+          }}
+        >
+          <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto' }}>
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'center', mb: 5 }}>
+              <Box
+                component="img"
+                src={CAMPLAR_BRAND.logoWordmark}
+                alt={CAMPLAR_BRAND.name}
+                sx={{ width: 176, maxWidth: '70vw' }}
+              />
             </Box>
+
+            <Stack spacing={1.2} mb={4}>
+              <Typography
+                sx={{
+                  fontFamily: CAMPLAR_FONTS.heading,
+                  fontWeight: 800,
+                  fontSize: { xs: '2rem', sm: '2.35rem' },
+                  color: CAMPLAR_COLORS.primary,
+                  letterSpacing: '-0.04em',
+                }}
+              >
+                Welcome Back
+              </Typography>
+              <Typography
+                sx={{
+                  color: alpha(CAMPLAR_COLORS.text, 0.68),
+                  lineHeight: 1.75,
+                  maxWidth: 420,
+                }}
+              >
+                Enter your credentials to access your dashboard.
+              </Typography>
+            </Stack>
+
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} mb={3.2}>
+              <GoogleButton />
+              <SocialButton
+                label="Microsoft"
+                icon={<FaMicrosoft />}
+                onClick={() =>
+                  toast.open({
+                    message: 'Microsoft sign-in is not connected yet. Use email access for now.',
+                    severity: 'info',
+                    position: { vertical: 'top', horizontal: 'center' },
+                  })
+                }
+              />
+            </Stack>
+
+            <Stack direction="row" spacing={1.8} alignItems="center" mb={3.2}>
+              <Divider sx={{ flex: 1, borderColor: alpha(CAMPLAR_COLORS.primary, 0.12) }} />
+              <Typography
+                sx={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.18em',
+                  color: alpha(CAMPLAR_COLORS.textMuted, 0.82),
+                }}
+              >
+                Or continue with
+              </Typography>
+              <Divider sx={{ flex: 1, borderColor: alpha(CAMPLAR_COLORS.primary, 0.12) }} />
+            </Stack>
+
+            <PhoneForm />
 
             <Typography
               sx={{
-                mt: 3,
-                color: alpha(MUTED, 0.82),
-                fontSize: '0.72rem',
-                lineHeight: 1.8,
+                mt: 5,
                 textAlign: 'center',
+                color: alpha(CAMPLAR_COLORS.text, 0.68),
+                fontSize: '0.95rem',
               }}
             >
-              Secure client access for Camplar shipping operations. Need help? {CAMPLAR_BRAND.email}
+              Don&apos;t have a client account?
+              <Link
+                component="a"
+                href={`mailto:${CAMPLAR_BRAND.email}?subject=Client%20Account%20Access`}
+                sx={{
+                  ml: 0.75,
+                  color: CAMPLAR_COLORS.secondary,
+                  fontWeight: 800,
+                  textDecorationColor: alpha(CAMPLAR_COLORS.secondary, 0.4),
+                }}
+              >
+                Contact your agent
+              </Link>
             </Typography>
+
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={{ xs: 1.2, sm: 3 }}
+              sx={{
+                mt: 7,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Link
+                component={RouterLink}
+                to="/privacy-policy"
+                sx={{
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.18em',
+                  color: alpha(CAMPLAR_COLORS.textMuted, 0.86),
+                }}
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                component={RouterLink}
+                to="/terms-of-service"
+                sx={{
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.18em',
+                  color: alpha(CAMPLAR_COLORS.textMuted, 0.86),
+                }}
+              >
+                Terms of Service
+              </Link>
+              <Link
+                component={RouterLink}
+                to="/contact-us"
+                sx={{
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.18em',
+                  color: alpha(CAMPLAR_COLORS.textMuted, 0.86),
+                }}
+              >
+                Support
+              </Link>
+              <Link
+                component="a"
+                href={`mailto:${CAMPLAR_BRAND.email}`}
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.7,
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  color: CAMPLAR_COLORS.primary,
+                }}
+              >
+                <FiMail size={14} />
+                {CAMPLAR_BRAND.email}
+              </Link>
+            </Stack>
           </Box>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   )
 }

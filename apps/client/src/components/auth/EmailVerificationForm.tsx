@@ -1,37 +1,16 @@
-import { Box, Stack, Typography } from '@mui/material'
-import { alpha } from '@mui/material/styles'
+import { alpha, Box, Link, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { FiEdit2, FiMail } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/auth/AuthContext'
 import { useVerifyEmailOtp } from '../../hooks/useRequestPasswordLogin'
-import CustomIconLoadingButton from '../UI/button/CustomLoadingButton'
-import CustomInput from '../UI/inputs/CustomInput'
+import { CAMPLAR_COLORS } from '../../utils/brand'
 import { toast } from '../UI/Toast'
+import { AuthActionButton, AuthTextField } from './AuthPrimitives'
+import { AUTH_COLORS, authInfoPanelSx } from './authTheme'
 import { getAuthErrorMessage } from './getAuthErrorMessage'
 
-const DE_BLUE = '#000B37'
-const DE_SOFT = '#001D67'
-const DE_ORANGE = '#A93800'
-const DE_MUTED = '#5F7187'
-
-const primaryButtonStyles = {
-  width: '100%',
-  borderRadius: 4,
-  bgcolor: DE_BLUE,
-  boxShadow: `0 8px 24px ${alpha(DE_BLUE, 0.3)}`,
-  '&:hover': { bgcolor: DE_SOFT },
-}
-
-const secondaryButtonStyles = {
-  width: '100%',
-  border: `1px solid ${alpha(DE_BLUE, 0.2)}`,
-  color: DE_BLUE,
-  backgroundColor: alpha(DE_BLUE, 0.04),
-  borderRadius: 4,
-}
-
-interface IEmailVerificationProps {
+interface EmailVerificationFormProps {
   email: string
   onEditEmail: () => void
   password: string
@@ -45,7 +24,7 @@ export default function EmailVerificationForm({
   onEditEmail,
   resendMail,
   verificationCode = '',
-}: IEmailVerificationProps) {
+}: EmailVerificationFormProps) {
   const { setTokens, setUserId } = useAuth()
   const navigate = useNavigate()
 
@@ -88,13 +67,13 @@ export default function EmailVerificationForm({
           sessionStorage.setItem('activeEmail', email)
           setError('')
           toast.open({
-            message: 'Email verified successfully',
+            message: 'Email verified successfully.',
             severity: 'success',
+            position: { vertical: 'top', horizontal: 'center' },
           })
           navigate('/onboarding-questions', { replace: true })
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onError: (err: any) => {
+        onError: (err: unknown) => {
           setError(getAuthErrorMessage(err, 'Invalid code. Please try again.'))
         },
       },
@@ -107,76 +86,97 @@ export default function EmailVerificationForm({
   }
 
   return (
-    <Stack spacing={2.2} width="100%">
-      <Box
-        sx={{
-          p: 1.6,
-          borderRadius: 3,
-          backgroundColor: alpha(DE_BLUE, 0.04),
-          border: `1px solid ${alpha(DE_BLUE, 0.1)}`,
-        }}
-      >
-        <Typography variant="body2" sx={{ color: DE_MUTED, lineHeight: 1.7, fontWeight: 500 }}>
-          Verification code generated for <strong>{email}</strong>.
-          <Box component="span" sx={{ ml: 0.7, display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: DE_BLUE }} onClick={onEditEmail}>
-            <FiEdit2 size={13} style={{ marginRight: 4 }} />
+    <Stack spacing={2.6} width="100%">
+      <Box sx={authInfoPanelSx}>
+        <Typography sx={{ color: alpha(CAMPLAR_COLORS.text, 0.72), lineHeight: 1.7 }}>
+          Verification code generated for <strong>{email}</strong>.{' '}
+          <Link
+            component="button"
+            underline="hover"
+            onClick={onEditEmail}
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.45,
+              fontWeight: 700,
+              color: AUTH_COLORS.primary,
+              textUnderlineOffset: 4,
+            }}
+          >
+            <FiEdit2 size={13} />
             Edit
-          </Box>
+          </Link>
         </Typography>
       </Box>
 
-      {verificationCode && (
+      {verificationCode ? (
         <Box
           sx={{
-            p: 1.5,
-            borderRadius: 3,
-            backgroundColor: alpha(DE_ORANGE, 0.08),
-            border: `1px solid ${alpha(DE_ORANGE, 0.24)}`,
+            p: 2,
+            borderRadius: 4,
+            backgroundColor: alpha(AUTH_COLORS.success, 0.08),
+            border: `1px solid ${alpha(AUTH_COLORS.success, 0.22)}`,
             textAlign: 'center',
           }}
         >
-          <Typography variant="caption" sx={{ display: 'block', color: DE_ORANGE, fontWeight: 800, letterSpacing: 1.4 }}>
-            DEMO VERIFICATION CODE
+          <Typography
+            sx={{
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.18em',
+              color: AUTH_COLORS.success,
+            }}
+          >
+            Demo Verification Code
           </Typography>
-          <Typography sx={{ mt: 0.45, color: DE_BLUE, fontSize: '1.55rem', fontWeight: 900, letterSpacing: '0.22em' }}>
+          <Typography
+            sx={{
+              mt: 0.8,
+              color: AUTH_COLORS.primary,
+              fontSize: '1.55rem',
+              fontWeight: 900,
+              letterSpacing: '0.24em',
+            }}
+          >
             {verificationCode}
           </Typography>
         </Box>
-      )}
+      ) : null}
 
-      <CustomInput
+      <AuthTextField
+        id="email-verification-code"
+        name="emailVerificationCode"
         label="Verification Code"
+        placeholder="Enter the code"
         value={code}
-        onChange={(e) => {
-          setCode(e.target.value)
+        onChange={(event) => {
+          setCode(event.target.value)
           setError('')
         }}
         required
+        autoComplete="one-time-code"
+        startAdornment={<FiMail size={16} />}
         error={touched && !!error}
-        helperText={touched && error}
-        prefix={<FiMail color={DE_BLUE} size={16} />}
+        helperText={touched ? error : ''}
       />
 
-      <Stack spacing={1.5}>
-        <CustomIconLoadingButton
-          onClick={handleSubmit}
-          styles={primaryButtonStyles}
-          textColor="#ffffff"
-          disabled={!code || isPending}
-          text="Verify email"
-          loading={isPending}
-          loadingText="Verifying..."
-        />
+      <AuthActionButton
+        onClick={handleSubmit}
+        text="Verify Email"
+        loading={isPending}
+        loadingText="Verifying..."
+        disabled={!code || isPending}
+      />
 
-        <Box sx={{ textAlign: 'center' }}>
-          <CustomIconLoadingButton
-            onClick={handleResend}
-            styles={secondaryButtonStyles}
-            disabled={resendCooldown > 0}
-            text={resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}
-          />
-        </Box>
-      </Stack>
+      <Box sx={{ textAlign: 'center' }}>
+        <AuthActionButton
+          variant="secondary"
+          onClick={handleResend}
+          disabled={resendCooldown > 0}
+          text={resendCooldown > 0 ? `Resend Code in ${resendCooldown}s` : 'Resend Code'}
+        />
+      </Box>
     </Stack>
   )
 }

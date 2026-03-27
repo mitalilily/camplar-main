@@ -1,5 +1,6 @@
 // AppRoutes.tsx
-import { lazy, Suspense } from 'react'
+import { Box } from '@mui/material'
+import { lazy, Suspense, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import RequireAuth from '../components/auth/wrapper/RequireAuth'
 import RequireMerchantReady from '../components/auth/wrapper/RequireMerchantReady'
@@ -96,6 +97,20 @@ const RtoList = lazy(() => import('../pages/ops/RtoList'))
 // API Integration
 const ApiIntegration = lazy(() => import('../pages/settings/ApiIntegration'))
 
+function PublicPageFrame({ children }: { children: ReactNode }) {
+  return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        px: { xs: 2, sm: 3.5, md: 5 },
+        py: { xs: 3, md: 5 },
+      }}
+    >
+      <Box sx={{ maxWidth: 1120, mx: 'auto' }}>{children}</Box>
+    </Box>
+  )
+}
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -108,6 +123,30 @@ export default function AppRoutes() {
           <Route path="/login" element={<Login />} />
           <Route path="/preview" element={<ClientPreview />} />
           <Route path="/tracking" element={<OrderTracking />} /> {/* 👈 NEW ROUTE */}
+          <Route
+            path="/privacy-policy"
+            element={
+              <PublicPageFrame>
+                <PrivacyPolicy />
+              </PublicPageFrame>
+            }
+          />
+          <Route
+            path="/terms-of-service"
+            element={
+              <PublicPageFrame>
+                <TermsOfService />
+              </PublicPageFrame>
+            }
+          />
+          <Route
+            path="/contact-us"
+            element={
+              <PublicPageFrame>
+                <CompanyDetails />
+              </PublicPageFrame>
+            }
+          />
           {/* onboarding */}
           <Route
             path="/onboarding-questions"

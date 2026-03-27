@@ -1,58 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Box, FormControlLabel, Link, Stack, Tooltip, Typography } from '@mui/material'
-import { alpha } from '@mui/material/styles'
-import { useState, type Dispatch, type SetStateAction } from 'react'
+import { alpha, Box, FormControlLabel, Link, Stack, Typography } from '@mui/material'
+import { useState } from 'react'
 import { FiMail, FiShield } from 'react-icons/fi'
-import { MdInfoOutline, MdPassword } from 'react-icons/md'
+import { MdPassword } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/auth/AuthContext'
 import { useRequestPasswordLogin } from '../../hooks/useRequestPasswordLogin'
-import CustomIconLoadingButton from '../UI/button/CustomLoadingButton'
+import { CAMPLAR_BRAND, CAMPLAR_COLORS } from '../../utils/brand'
 import CustomCheckbox from '../UI/inputs/CustomCheckbox'
-import CustomInput from '../UI/inputs/CustomInput'
 import { toast } from '../UI/Toast'
+import { AuthActionButton, AuthTextField } from './AuthPrimitives'
 import EmailVerificationForm from './EmailVerificationForm'
+import { AUTH_COLORS, authInfoPanelSx } from './authTheme'
 import { getAuthErrorMessage } from './getAuthErrorMessage'
 
-const DE_BLUE = '#000B37'
-const DE_SOFT = '#001D67'
-const DE_AMBER = '#A93800'
-const DE_MUTED = '#5F7187'
-
-const primaryButtonStyles = {
-  width: '100%',
-  borderRadius: 4,
-  bgcolor: DE_BLUE,
-  boxShadow: `0 8px 24px ${alpha(DE_BLUE, 0.3)}`,
-  '&:hover': { bgcolor: DE_SOFT },
+interface PasswordLoginFormProps {
+  onOpenTerms: () => void
 }
 
-interface IPasswordFormProps {
-  setStep: Dispatch<SetStateAction<number>>
-  step: number
-  setOpenTerms: Dispatch<SetStateAction<boolean>>
-}
-
-export default function PasswordLoginForm({ setStep, step, setOpenTerms }: IPasswordFormProps) {
+export default function PasswordLoginForm({ onOpenTerms }: PasswordLoginFormProps) {
   const { setTokens, setUserId } = useAuth()
   const navigate = useNavigate()
   const { mutate: requestPasswordLogin, isPending } = useRequestPasswordLogin()
 
+  const [step, setStep] = useState(0)
   const [emailForm, setEmailForm] = useState({
     email: '',
     password: '',
   })
-
   const [errors, setErrors] = useState({
     email: '',
     password: '',
   })
-
   const [touched, setTouched] = useState({
     email: false,
     password: false,
   })
-
   const [termsChecked, setTermsChecked] = useState(false)
   const [verificationCode, setVerificationCode] = useState('')
 
@@ -71,34 +54,22 @@ export default function PasswordLoginForm({ setStep, step, setOpenTerms }: IPass
 
   const handleChange = (field: 'email' | 'password', value: string) => {
     setEmailForm((prev) => ({ ...prev, [field]: value }))
-    if (field === 'email') setVerificationCode('')
+    if (field === 'email') {
+      setVerificationCode('')
+    }
 
     if (touched[field]) {
-      const error = field === 'email' ? validateEmail(value) : validatePassword(value)
-      setErrors((prev) => ({ ...prev, [field]: error }))
+      const nextError = field === 'email' ? validateEmail(value) : validatePassword(value)
+      setErrors((prev) => ({ ...prev, [field]: nextError }))
     }
   }
 
   const handleBlur = (field: 'email' | 'password') => {
     setTouched((prev) => ({ ...prev, [field]: true }))
-    const value = emailForm[field]
-    const error = field === 'email' ? validateEmail(value) : validatePassword(value)
-    setErrors((prev) => ({ ...prev, [field]: error }))
+    const nextError =
+      field === 'email' ? validateEmail(emailForm[field]) : validatePassword(emailForm[field])
+    setErrors((prev) => ({ ...prev, [field]: nextError }))
   }
-
-  const termsLabel = (
-    <Typography fontSize="13px" display="flex" alignItems="center" gap="3px" color={DE_MUTED}>
-      I agree to{' '}
-      <Link
-        component="button"
-        underline="hover"
-        onClick={() => setOpenTerms(true)}
-        sx={{ cursor: 'pointer', color: DE_BLUE, fontWeight: 700 }}
-      >
-        Terms and Conditions
-      </Link>
-    </Typography>
-  )
 
   const isFormValid = !validateEmail(emailForm.email) && !validatePassword(emailForm.password)
 
@@ -118,158 +89,180 @@ export default function PasswordLoginForm({ setStep, step, setOpenTerms }: IPass
     setErrors({ email: emailError, password: passwordError })
     setTouched({ email: true, password: true })
 
-    if (!emailError && !passwordError) {
-      sessionStorage.setItem('preferredMethod', 'password')
+    if (emailError || passwordError) {
+      return
+    }
 
-      requestPasswordLogin(
-        {
-          email: emailForm.email,
-          password: emailForm.password,
-        },
-        {
-          onSuccess: ({ message, token, refreshToken, user, verificationToken }) => {
-            const inlineVerificationToken =
-              typeof verificationToken === 'string' ? verificationToken : undefined
+    sessionStorage.setItem('preferredMethod', 'password')
 
-            if (message) {
-              toast.open({
-                message:
-                  inlineVerificationToken || message.includes('Verification code generated')
-                    ? 'Verification code generated and shown below.'
-                    : message,
-                severity: 'success',
-                position: { vertical: 'top', horizontal: 'center' },
-              })
-            }
+    requestPasswordLogin(
+      {
+        email: emailForm.email,
+        password: emailForm.password,
+      },
+      {
+        onSuccess: ({ message, token, refreshToken, user, verificationToken }) => {
+          const inlineVerificationToken =
+            typeof verificationToken === 'string' ? verificationToken : undefined
 
-            if (typeof inlineVerificationToken === 'string') {
-              setVerificationCode(inlineVerificationToken)
-            } else {
-              setVerificationCode('')
-            }
-
-            if (message.includes('Verification email sent') || message.includes('Verification code generated')) {
-              setStep(1)
-              return
-            }
-
-            setUserId(user?.id)
-            setTokens(token, refreshToken)
-            navigate('/onboarding-questions', { replace: true })
-          },
-          onError: (error: any) => {
+          if (message) {
             toast.open({
-              message: getAuthErrorMessage(error, 'Something went wrong'),
-              severity: 'error',
+              message:
+                inlineVerificationToken || message.includes('Verification code generated')
+                  ? 'Verification code generated and shown below.'
+                  : message,
+              severity: 'success',
               position: { vertical: 'top', horizontal: 'center' },
             })
-          },
+          }
+
+          if (typeof inlineVerificationToken === 'string') {
+            setVerificationCode(inlineVerificationToken)
+          } else {
+            setVerificationCode('')
+          }
+
+          if (
+            message.includes('Verification email sent') ||
+            message.includes('Verification code generated')
+          ) {
+            setStep(1)
+            return
+          }
+
+          setUserId(user?.id)
+          setTokens(token, refreshToken)
+          navigate('/onboarding-questions', { replace: true })
         },
-      )
-    }
+        onError: (error: any) => {
+          toast.open({
+            message: getAuthErrorMessage(error, 'Something went wrong'),
+            severity: 'error',
+            position: { vertical: 'top', horizontal: 'center' },
+          })
+        },
+      },
+    )
   }
 
-  return step === 0 ? (
-    <Stack width="100%" spacing={2.4}>
-      <Box
-        sx={{
-          p: 1.5,
-          borderRadius: 3,
-          border: `1px solid ${alpha(DE_BLUE, 0.1)}`,
-          backgroundColor: alpha(DE_BLUE, 0.04),
-        }}
-      >
-        <Typography variant="body2" sx={{ color: DE_MUTED, lineHeight: 1.7, fontWeight: 500 }}>
+  if (step === 1) {
+    return (
+      <EmailVerificationForm
+        onEditEmail={() => setStep(0)}
+        email={emailForm.email}
+        resendMail={handleSubmit}
+        password={emailForm.password}
+        verificationCode={verificationCode}
+      />
+    )
+  }
+
+  return (
+    <Stack spacing={2.6}>
+      <Box sx={authInfoPanelSx}>
+        <Typography sx={{ color: alpha(CAMPLAR_COLORS.text, 0.72), lineHeight: 1.7 }}>
           Enter your registered email and password. If verification is needed, the code will
           appear directly on this screen.
         </Typography>
       </Box>
 
-      <Stack spacing={1.1}>
-        <CustomInput
-          prefix={<FiMail color={DE_BLUE} size={15} />}
-          type="email"
-          name="email"
-          id="email"
-          label="Email"
-          value={emailForm.email}
-          onChange={(e) => handleChange('email', e.target.value)}
-          onBlur={() => handleBlur('email')}
-          required
-          helperText={touched.email && errors.email}
-          error={touched.email && !!errors.email}
-        />
+      <AuthTextField
+        type="email"
+        id="password-email"
+        name="email"
+        label="Email Address"
+        placeholder="name@company.com"
+        value={emailForm.email}
+        onChange={(event) => handleChange('email', event.target.value)}
+        onBlur={() => handleBlur('email')}
+        required
+        autoComplete="email"
+        startAdornment={<FiMail size={17} />}
+        error={touched.email && !!errors.email}
+        helperText={touched.email ? errors.email : ''}
+      />
 
-        <CustomInput
-          label="Password"
-          name="password"
-          id="password"
-          type="password"
-          prefix={<MdPassword color={DE_BLUE} size={16} />}
-          postfix={
-            <Tooltip
-              title={
-                <Typography fontSize="12px">
-                  For enhanced security, we recommend using the One-Time Passcode method.
-                </Typography>
-              }
-              arrow
-            >
-              <Box sx={{ display: 'inline-flex', alignItems: 'center', color: DE_AMBER }}>
-                <MdInfoOutline size={17} />
-              </Box>
-            </Tooltip>
-          }
-          value={emailForm.password}
-          onChange={(e) => handleChange('password', e.target.value)}
-          onBlur={() => handleBlur('password')}
-          required
-          helperText={touched.password && errors.password}
-          error={touched.password && !!errors.password}
-        />
-      </Stack>
+      <AuthTextField
+        type="password"
+        id="password"
+        name="password"
+        label="Password"
+        labelAction={
+          <Link
+            component="a"
+            href={`mailto:${CAMPLAR_BRAND.email}?subject=Password%20Reset%20Request`}
+            sx={{
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              color: CAMPLAR_COLORS.secondary,
+              textUnderlineOffset: 4,
+            }}
+          >
+            Forgot Password?
+          </Link>
+        }
+        placeholder="Enter your password"
+        value={emailForm.password}
+        onChange={(event) => handleChange('password', event.target.value)}
+        onBlur={() => handleBlur('password')}
+        required
+        autoComplete="current-password"
+        startAdornment={<MdPassword size={18} />}
+        error={touched.password && !!errors.password}
+        helperText={touched.password ? errors.password : ''}
+      />
 
       <FormControlLabel
-        sx={{ mt: 0.4, alignItems: 'flex-start' }}
+        sx={{ m: 0, alignItems: 'flex-start', gap: 0.5 }}
         control={
           <CustomCheckbox
             checked={termsChecked}
-            onChange={(e) => setTermsChecked(e.target.checked)}
+            onChange={(event) => setTermsChecked(event.target.checked)}
             color="primary"
           />
         }
         label={
-          <Typography mt={0.4} variant="body2">
-            {termsLabel}
+          <Typography
+            sx={{
+              pt: 0.35,
+              fontSize: '0.9rem',
+              color: alpha(CAMPLAR_COLORS.text, 0.7),
+              lineHeight: 1.65,
+            }}
+          >
+            I agree to{' '}
+            <Link
+              component="button"
+              underline="hover"
+              onClick={onOpenTerms}
+              sx={{
+                cursor: 'pointer',
+                color: AUTH_COLORS.primary,
+                fontWeight: 700,
+                textUnderlineOffset: 4,
+              }}
+            >
+              Terms and Conditions
+            </Link>
           </Typography>
         }
       />
 
-      <CustomIconLoadingButton
+      <AuthActionButton
         type="button"
-        text="Sign in with password"
-        styles={primaryButtonStyles}
-        onClick={handleSubmit}
-        disabled={!isFormValid}
+        text="Sign In"
         loading={isPending}
         loadingText="Signing in..."
-        textColor="#fff"
+        onClick={handleSubmit}
+        disabled={!isFormValid || isPending}
       />
 
       <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
-        <FiShield size={13} color={DE_AMBER} />
-        <Typography variant="caption" sx={{ color: DE_MUTED, fontWeight: 600 }}>
+        <FiShield size={13} color={AUTH_COLORS.success} />
+        <Typography variant="caption" sx={{ color: alpha(CAMPLAR_COLORS.text, 0.66), fontWeight: 700 }}>
           Verification safeguards are applied for suspicious login attempts.
         </Typography>
       </Stack>
     </Stack>
-  ) : (
-    <EmailVerificationForm
-      onEditEmail={() => setStep(0)}
-      email={emailForm?.email}
-      resendMail={handleSubmit}
-      password={emailForm?.password}
-      verificationCode={verificationCode}
-    />
   )
 }
